@@ -3,7 +3,12 @@ package repository
 import "project/internal/model"
 
 type Company interface {
-	CreateCompany(model.Company)
+	CreateCompany(model.Company) (model.Company, error)
+	GetAllCompany() ([]model.Company, error)
+	GetCompany(id int) (model.Company, error)
+	CreateJob(j model.Job) (model.Job, error)
+	GetJobs(id int) ([]model.Job, error)
+	GetAllJobs() ([]model.Job, error)
 }
 
 func (r Repo) CreateCompany(u model.Company) (model.Company, error) {

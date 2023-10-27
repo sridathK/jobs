@@ -22,7 +22,7 @@ func main() {
 }
 func startApp() error {
 	log.Info().Msg("started main")
-	privatePEM, err := os.ReadFile(`C:\Users\ORR Training 1\Desktop\myserviceapp\private.pem`)
+	privatePEM, err := os.ReadFile(`C:\Users\Srida\Project\jobs\project\private.pem`)
 	if err != nil {
 		return fmt.Errorf("cannot find file private.pem %w", err)
 	}
@@ -31,7 +31,7 @@ func startApp() error {
 		return fmt.Errorf("cannot convert byte to key %w", err)
 	}
 
-	publicPEM, err := os.ReadFile(`C:\Users\ORR Training 1\Desktop\myserviceapp\pubkey.pem`)
+	publicPEM, err := os.ReadFile(`C:\Users\Srida\Project\jobs\project\pubkey.pem`)
 	if err != nil {
 		return fmt.Errorf("cannot find file pubkey.pem %w", err)
 	}
@@ -53,7 +53,7 @@ func startApp() error {
 		return err
 	}
 
-	se, err := services.NewService(repo)
+	se, err := services.NewService(repo, repo)
 
 	if err != nil {
 		return err
@@ -61,7 +61,7 @@ func startApp() error {
 
 	api := http.Server{ //server config and settimngs
 		Addr:    ":8090",
-		Handler: handlers.Api(a, *se),
+		Handler: handlers.Api(a, se),
 	}
 	api.ListenAndServe()
 
