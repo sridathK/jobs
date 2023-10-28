@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Api(a *auth.Auth, s services.Service) *gin.Engine {
+func Api(a *auth.Auth, s *services.Service) *gin.Engine {
 	r := gin.New()
 	h := handler{a: a, us: s}
 	m, _ := middlewear.NewMiddleWear(a)

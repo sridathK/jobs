@@ -15,7 +15,7 @@ import (
 
 type handler struct {
 	a  *auth.Auth
-	us services.Service
+	us *services.Service
 }
 
 func (h *handler) userSignin(c *gin.Context) {

@@ -18,16 +18,16 @@ type Service struct {
 	c repository.Company
 }
 
-func NewService(r repository.Users, c repository.Company) (Service, error) {
+func NewService(r repository.Users, c repository.Company) (*Service, error) {
 	if r == nil {
-		return Service{}, errors.New("db connection not given")
+		return nil, errors.New("db connection not given")
 	}
 
-	return Service{r: r, c: c}, nil
+	return &Service{r: r, c: c}, nil
 
 }
 
-func (s Service) UserSignup(nu model.UserSignup) (model.User, error) {
+func (s *Service) UserSignup(nu model.UserSignup) (model.User, error) {
 
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(nu.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -46,7 +46,7 @@ func (s Service) UserSignup(nu model.UserSignup) (model.User, error) {
 	return cu, nil
 
 }
-func (s Service) Userlogin(l model.UserLogin) (jwt.RegisteredClaims, error) {
+func (s *Service) Userlogin(l model.UserLogin) (jwt.RegisteredClaims, error) {
 	fu, err := s.r.FetchUserByEmail(l.Email)
 	if err != nil {
 		log.Error().Err(err).Msg("couldnot find user")

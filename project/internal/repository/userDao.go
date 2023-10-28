@@ -11,12 +11,12 @@ type Repo struct {
 	db *gorm.DB
 }
 
-func NewRepo(db *gorm.DB) (Repo, error) {
+func NewRepo(db *gorm.DB) (*Repo, error) {
 	if db == nil {
-		return Repo{}, errors.New("db connection not given")
+		return nil, errors.New("db connection not given")
 	}
 
-	return Repo{db: db}, nil
+	return &Repo{db: db}, nil
 
 }
 
@@ -25,7 +25,7 @@ type Users interface {
 	FetchUserByEmail(string) (model.User, error)
 }
 
-func (r Repo) CreateUser(u model.User) (model.User, error) {
+func (r *Repo) CreateUser(u model.User) (model.User, error) {
 	err := r.db.Create(&u).Error
 	if err != nil {
 		return model.User{}, err
@@ -33,7 +33,7 @@ func (r Repo) CreateUser(u model.User) (model.User, error) {
 	return u, nil
 }
 
-func (r Repo) FetchUserByEmail(s string) (model.User, error) {
+func (r *Repo) FetchUserByEmail(s string) (model.User, error) {
 	var u model.User
 	tx := r.db.Where("email=?", s).First(&u)
 	if tx.Error != nil {
