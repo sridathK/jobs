@@ -22,7 +22,7 @@ func main() {
 }
 func startApp() error {
 	log.Info().Msg("started main")
-	privatePEM, err := os.ReadFile(`C:\Users\ORR Training 1\Desktop\jobs\project\private.pem`)
+	privatePEM, err := os.ReadFile(`C:\Users\Srida\Project\jobs\project\private.pem`)
 	if err != nil {
 		return fmt.Errorf("cannot find file private.pem %w", err)
 	}
@@ -31,7 +31,7 @@ func startApp() error {
 		return fmt.Errorf("cannot convert byte to key %w", err)
 	}
 
-	publicPEM, err := os.ReadFile(`C:\Users\ORR Training 1\Desktop\jobs\project\pubkey.pem`)
+	publicPEM, err := os.ReadFile(`C:\Users\Srida\Project\jobs\project\pubkey.pem`)
 	if err != nil {
 		return fmt.Errorf("cannot find file pubkey.pem %w", err)
 	}

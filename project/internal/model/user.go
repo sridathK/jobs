@@ -23,3 +23,12 @@ type UserLogin struct {
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
+
+// func (m *UserSignup) Read(p []byte) (n int, err error) {
+// 	if m.pos >= len(m.data) {
+// 		return 0, io.EOF
+// 	}
+// 	n = copy(p, m.data[m.pos:])
+// 	m.pos += n
+// 	return n, nil
+// }
