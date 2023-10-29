@@ -43,7 +43,7 @@ func (s *Service) JobCreate(nj model.CreateJob, id uint64) (model.Job, error) {
 	cu, err := s.c.CreateJob(job)
 	if err != nil {
 		log.Error().Err(err).Msg("couldnot create user")
-		return model.Job{}, errors.New("user creation failed")
+		return model.Job{}, errors.New("job creation failed")
 	}
 
 	return cu, nil
@@ -52,7 +52,7 @@ func (s *Service) JobCreate(nj model.CreateJob, id uint64) (model.Job, error) {
 func (s *Service) GetJobs(id int) ([]model.Job, error) {
 	AllCompanies, err := s.c.GetJobs(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("job retreval failed")
 	}
 	return AllCompanies, nil
 }

@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 
 	"project/internal/model"
 	"project/internal/repository"
@@ -52,7 +53,7 @@ func (s *Service) Userlogin(l model.UserLogin) (jwt.RegisteredClaims, error) {
 		log.Error().Err(err).Msg("couldnot find user")
 		return jwt.RegisteredClaims{}, errors.New("user login failed")
 	}
-
+	fmt.Println(fu)
 	err = bcrypt.CompareHashAndPassword([]byte(fu.PasswordHash), []byte(l.Password))
 	if err != nil {
 		log.Error().Err(err).Msg("password of user incorrect")
@@ -65,6 +66,7 @@ func (s *Service) Userlogin(l model.UserLogin) (jwt.RegisteredClaims, error) {
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	}
+	fmt.Println(c)
 
 	return c, nil
 
