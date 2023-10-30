@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"io"
+	"net/http"
 	"project/internal/model"
+	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -62,10 +64,16 @@ func initialization() {
 
 }
 
+
 func Test_handler_userSignin(t *testing.T) {
 	type args struct {
 		c *gin.Context
+	
 	}
+	r1,_:=http.NewRequest(http.MethodPost,"",strings.NewReader(`{"name":     "names",
+	"email":    "name@gmail.com",
+	"password": "hfhhfhfh"}`))
+	
 	tests := []struct {
 		name string
 		h    *handler
@@ -73,7 +81,7 @@ func Test_handler_userSignin(t *testing.T) {
 	}{
 		{name: "failure in traceid",
 			h:    &handler{us: &UserHandlerMock{}},
-			args: args{c: c1},
+			args: args{c: &gin.Context{Request:r1}}},
 		},
 		{
 			name: " failure in validation",
