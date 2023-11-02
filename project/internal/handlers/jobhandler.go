@@ -43,7 +43,7 @@ func (h *handler) companyCreation(c *gin.Context) {
 	// Regclaims:=ctx.Value(middlewear.TokenIdKey)
 	// companyCreation.User= int(Regclaims.Subject)
 
-	us, err := h.us.CompanyCreate(companyCreation)
+	us, err := h.cs.CompanyCreate(companyCreation)
 	if err != nil {
 		log.Error().Err(err).Str("Trace Id", traceId).Msg("company creation problem in db")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "compoany creation failed"})
@@ -64,7 +64,7 @@ func (h *handler) getAllCompany(c *gin.Context) {
 		return
 	}
 
-	us, err := h.us.GetAllCompanies()
+	us, err := h.cs.GetAllCompanies()
 	if err != nil {
 		log.Error().Err(err).Str("Trace Id", traceId).Msg("get all company problem from db")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": " could not get all companies"})
@@ -90,7 +90,7 @@ func (h *handler) getCompany(c *gin.Context) {
 		return
 	}
 
-	us, err := h.us.GetCompany(id)
+	us, err := h.cs.GetCompany(id)
 	if err != nil {
 		log.Error().Err(err).Str("Trace Id", traceId).Msg("get company problem")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
@@ -130,7 +130,7 @@ func (h *handler) postJob(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
-	us, err := h.us.JobCreate(jobCreation, id)
+	us, err := h.cs.JobCreate(jobCreation, id)
 
 	if err != nil {
 		log.Error().Err(err).Str("Trace Id", traceId).Msg("job creatuion problem in db")
@@ -155,7 +155,7 @@ func (h *handler) getJob(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
-	us, err := h.us.GetJobs(id)
+	us, err := h.cs.GetJobs(id)
 	if err != nil {
 		log.Error().Err(err).Str("Trace Id", traceId).Msg("getting jobs problem fro db")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
@@ -174,7 +174,7 @@ func (h *handler) getAllJob(c *gin.Context) {
 		return
 	}
 
-	us, err := h.us.GetAllJobs()
+	us, err := h.cs.GetAllJobs()
 	if err != nil {
 		log.Error().Err(err).Str("Trace Id", traceId).Msg("geting all jobs problem from db")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})

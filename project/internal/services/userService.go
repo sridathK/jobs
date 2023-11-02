@@ -28,6 +28,11 @@ func NewService(r repository.Users, c repository.Company) (*Service, error) {
 
 }
 
+type UsersService interface {
+	UserSignup(nu model.UserSignup) (model.User, error)
+	Userlogin(l model.UserLogin) (jwt.RegisteredClaims, error)
+}
+
 func (s *Service) UserSignup(nu model.UserSignup) (model.User, error) {
 
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(nu.Password), bcrypt.DefaultCost)
