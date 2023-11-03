@@ -2,6 +2,7 @@ package repository
 
 import "project/internal/model"
 
+//go:generate mockgen -source=jobDao.go -destination=companyrepository_mock.go -package=repository
 type Company interface {
 	CreateCompany(model.Company) (model.Company, error)
 	GetAllCompany() ([]model.Company, error)

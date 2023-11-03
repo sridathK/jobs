@@ -20,6 +20,7 @@ func NewRepo(db *gorm.DB) (*Repo, error) {
 
 }
 
+//go:generate mockgen -source=userDao.go -destination=userrepository_mock.go -package=repository
 type Users interface {
 	CreateUser(model.User) (model.User, error)
 	FetchUserByEmail(string) (model.User, error)

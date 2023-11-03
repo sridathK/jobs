@@ -39,13 +39,15 @@ func (s *Service) GetAllCompanies() ([]model.Company, error) {
 }
 
 func (s *Service) GetCompany(id int) (model.Company, error) {
-
-	AllCompanies, err := s.c.GetCompany(id)
+	if id > 10 {
+		return model.Company{}, errors.New("id cannnot be greater")
+	}
+	Companies, err := s.c.GetCompany(id)
 	if err != nil {
 		log.Error().Err(err).Msg("couldnot get company")
 		return model.Company{}, err
 	}
-	return AllCompanies, nil
+	return Companies, nil
 
 }
 
@@ -61,6 +63,9 @@ func (s *Service) JobCreate(nj model.CreateJob, id uint64) (model.Job, error) {
 }
 
 func (s *Service) GetJobs(id int) ([]model.Job, error) {
+	if id > 10 {
+		return nil, errors.New("id cannnot be greater")
+	}
 	AllCompanies, err := s.c.GetJobs(id)
 	if err != nil {
 		return nil, errors.New("job retreval failed")

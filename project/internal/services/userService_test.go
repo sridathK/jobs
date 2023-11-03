@@ -3,59 +3,63 @@ package services
 import (
 	"errors"
 	"project/internal/model"
+	"project/internal/repository"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"go.uber.org/mock/gomock"
 )
 
-type MockUserSignup struct{}
-
-func (m *MockUserSignup) CreateUser(m1 model.User) (model.User, error) {
-	if m1.UserName == "" {
-		return model.User{}, errors.New("incorrect input")
-	}
-	return model.User{UserName: m1.UserName, Email: m1.Email}, nil
-
-}
-func (m *MockUserSignup) FetchUserByEmail(s string) (model.User, error) {
-	if s == "" {
-		return model.User{}, errors.New("incorrect input")
-	}
-
-	return model.User{UserName: "names", Email: "name@gmail.com", PasswordHash: "$2a$10$votXUqKwkXe6l5.2aVKSU.08QEPzZYuXy47OP7JuHebrZSppBlYSW"}, nil
-}
 func TestService_UserSignup(t *testing.T) {
-	// type args struct {
-	// 	nu model.UserSignup
-	// }
+	type args struct {
+		nu model.UserSignup
+	}
 	tests := []struct {
-		name    string
-		s       *Service
-		nu      model.UserSignup
-		want    model.User
-		wantErr error
+		name string
+		//s       *Service
+		args             args
+		want             model.User
+		wantErr          bool
+		mockRepoResponse func() (model.User, error)
 	}{
-		{name: "checking mocked  sucess",
-			s:       &Service{r: &MockUserSignup{}},
-			nu:      model.UserSignup{UserName: "names", Email: "name@gmail.com", Password: "hfhhfhfh"},
-			want:    model.User{UserName: "names", Email: "name@gmail.com"},
-			wantErr: nil,
+		{
+			name: "success",
+			want: model.User{UserName: "sridath", Email: "dath@gmail.com"},
+			args: args{
+				nu: model.UserSignup{UserName: "sridath", Email: "dath@gmail.com", Password: "bangalore"},
+			},
+			wantErr: false,
+			mockRepoResponse: func() (model.User, error) {
+				return model.User{UserName: "sridath", Email: "dath@gmail.com"}, nil
+			},
 		},
-
-		{name: "checking mocked failure ",
-			s:       &Service{r: &MockUserSignup{}},
-			nu:      model.UserSignup{UserName: "", Email: "", Password: ""},
-			want:    model.User{},
-			wantErr: errors.New("user creation failed"),
+		{
+			name: "failure",
+			want: model.User{},
+			args: args{
+				nu: model.UserSignup{UserName: "", Email: "dath@gmail.com", Password: "bangalore"},
+			},
+			wantErr: true,
+			mockRepoResponse: func() (model.User, error) {
+				return model.User{}, errors.New("test error")
+			},
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.s.UserSignup(tt.nu)
-			if err != tt.wantErr {
+			mc := gomock.NewController(t)
+			mockUserRepo := repository.NewMockUsers(mc)
+			mockCompanyRepo := repository.NewMockCompany(mc)
+
+			if tt.mockRepoResponse != nil {
+				mockUserRepo.EXPECT().CreateUser(gomock.Any()).Return(tt.mockRepoResponse()).AnyTimes()
+			}
+
+			s, _ := NewService(mockUserRepo, mockCompanyRepo)
+			got, err := s.UserSignup(tt.args.nu)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("Service.UserSignup() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -66,33 +70,48 @@ func TestService_UserSignup(t *testing.T) {
 	}
 }
 
-// ///////////    test case for login ///////////////////////
 func TestService_Userlogin(t *testing.T) {
-
+	type args struct {
+		l model.UserLogin
+	}
 	tests := []struct {
-		name    string
-		s       *Service
-		nu      model.UserLogin
-		want    jwt.RegisteredClaims
-		wantErr error
+		name string
+		//s       *Service
+		args             args
+		want             jwt.RegisteredClaims
+		wantErr          bool
+		mockRepoResponse func() (model.User, error)
 	}{
 		{name: "checking  sucess case",
-			s:       &Service{r: &MockUserSignup{}},
-			nu:      model.UserLogin{Email: "name@gmail.com", Password: "hfhhfhfh"},
+			args:    args{l: model.UserLogin{Email: "name@gmail.com", Password: "hfhbhfrbfrbfrwbfbfbrfbrhfhfh"}},
 			want:    jwt.RegisteredClaims{Issuer: "service project", Subject: "0", Audience: jwt.ClaimStrings{"users"}, ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)), IssuedAt: jwt.NewNumericDate(time.Now())},
-			wantErr: nil,
+			wantErr: false,
+			mockRepoResponse: func() (model.User, error) {
+				return model.User{UserName: "sridath", Email: "dath@gmail.com", PasswordHash: "$2a$10$dy5br0fE1KHYarImvJZhcu1VkGy2s/OGjL9cwQzPAPflCvgNeE8VG"}, nil
+			},
 		},
 		{name: "checking  failure case",
-			s:       &Service{r: &MockUserSignup{}},
-			nu:      model.UserLogin{Email: "", Password: ""},
+			args:    args{l: model.UserLogin{Email: "", Password: "hfhhfhfh"}},
 			want:    jwt.RegisteredClaims{},
-			wantErr: errors.New("= user login failed"),
+			wantErr: true,
+			mockRepoResponse: func() (model.User, error) {
+				return model.User{}, errors.New("test error")
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.s.Userlogin(tt.nu)
-			if err != tt.wantErr {
+			mc := gomock.NewController(t)
+			mockUserRepo := repository.NewMockUsers(mc)
+			mockCompanyRepo := repository.NewMockCompany(mc)
+
+			if tt.mockRepoResponse != nil {
+				mockUserRepo.EXPECT().FetchUserByEmail(gomock.Any()).Return(tt.mockRepoResponse()).AnyTimes()
+			}
+
+			s, _ := NewService(mockUserRepo, mockCompanyRepo)
+			got, err := s.Userlogin(tt.args.l)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("Service.Userlogin() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
