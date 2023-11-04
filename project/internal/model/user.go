@@ -8,8 +8,8 @@ import (
 
 type User struct {
 	gorm.Model
-	UserName     string `json:"name" validate:"required,unique" gorm:"unique,notnull"`
-	Email        string `json:"email" validate:"required"`
+	UserName     string `json:"name"  gorm:"unique"`
+	Email        string `json:"email"  gorm:"unique"`
 	PasswordHash string `json:"-" validate:"required"`
 }
 

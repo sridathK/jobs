@@ -19,6 +19,8 @@ type Service struct {
 	c repository.Company
 }
 
+// GetCompanyById implements CompanyService.
+
 func NewService(r repository.Users, c repository.Company) (*Service, error) {
 	if r == nil {
 		return nil, errors.New("db connection not given")
@@ -28,6 +30,7 @@ func NewService(r repository.Users, c repository.Company) (*Service, error) {
 
 }
 
+//go:generate mockgen -source=userService.go -destination=userservice_mock.go -package=services
 type UsersService interface {
 	UserSignup(nu model.UserSignup) (model.User, error)
 	Userlogin(l model.UserLogin) (jwt.RegisteredClaims, error)

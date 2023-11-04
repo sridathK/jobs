@@ -114,7 +114,7 @@ func TestService_GetCompany(t *testing.T) {
 				mockCompanyRepo.EXPECT().GetCompany(tt.args.id).Return(tt.mockRepoResponse()).AnyTimes()
 			}
 			s, _ := NewService(mockUserRepo, mockCompanyRepo)
-			got, err := s.GetCompany(tt.args.id)
+			got, err := s.GetCompanyById(tt.args.id)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Service.GetCompany() error = %v, wantErr %v", err, tt.wantErr)
@@ -279,7 +279,7 @@ func TestService_GetJobs(t *testing.T) {
 				mockCompanyRepo.EXPECT().GetJobs(tt.args.id).Return(tt.mockRepoResponse()).AnyTimes()
 			}
 			s, _ := NewService(mockUserRepo, mockCompanyRepo)
-			got, err := s.GetJobs(tt.args.id)
+			got, err := s.GetJobsByCompanyId(tt.args.id)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Service.GetJob() error = %v, wantErr %v", err, tt.wantErr)

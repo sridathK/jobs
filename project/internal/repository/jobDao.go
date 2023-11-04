@@ -10,6 +10,7 @@ type Company interface {
 	CreateJob(j model.Job) (model.Job, error)
 	GetJobs(id int) ([]model.Job, error)
 	GetAllJobs() ([]model.Job, error)
+	GetJobsByJobId(id int) (model.Job, error)
 }
 
 func (r *Repo) CreateCompany(u model.Company) (model.Company, error) {
@@ -32,8 +33,8 @@ func (r *Repo) GetAllCompany() ([]model.Company, error) {
 
 func (r *Repo) GetCompany(id int) (model.Company, error) {
 	var m model.Company
-
-	tx := r.db.Where("id = ?", id)
+	id1 := uint64(id)
+	tx := r.db.Where("id = ?", id1)
 	err := tx.Find(&m).Error
 	if err != nil {
 		return model.Company{}, err
@@ -70,4 +71,16 @@ func (r *Repo) GetAllJobs() ([]model.Job, error) {
 	}
 
 	return s, nil
+}
+
+func (r *Repo) GetJobsByJobId(id int) (model.Job, error) {
+	var m model.Job
+
+	tx := r.db.Where("id = ?", id)
+	err := tx.Find(&m).Error
+	if err != nil {
+		return model.Job{}, err
+	}
+	return m, nil
+
 }

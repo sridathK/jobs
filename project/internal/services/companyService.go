@@ -7,13 +7,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+//go:generate mockgen -source=companyService.go -destination=companyservice_mock.go -package=services
 type CompanyService interface {
 	CompanyCreate(nc model.CreateCompany) (model.Company, error)
 	GetAllCompanies() ([]model.Company, error)
-	GetCompany(id int) (model.Company, error)
+	GetCompanyById(id int) (model.Company, error)
 	JobCreate(nj model.CreateJob, id uint64) (model.Job, error)
-	GetJobs(id int) ([]model.Job, error)
+	GetJobsByCompanyId(id int) ([]model.Job, error)
 	GetAllJobs() ([]model.Job, error)
+	GetJobByJobId(id int) (model.Job, error)
 }
 
 func (s *Service) CompanyCreate(nc model.CreateCompany) (model.Company, error) {
@@ -38,7 +40,7 @@ func (s *Service) GetAllCompanies() ([]model.Company, error) {
 
 }
 
-func (s *Service) GetCompany(id int) (model.Company, error) {
+func (s *Service) GetCompanyById(id int) (model.Company, error) {
 	if id > 10 {
 		return model.Company{}, errors.New("id cannnot be greater")
 	}
@@ -62,7 +64,7 @@ func (s *Service) JobCreate(nj model.CreateJob, id uint64) (model.Job, error) {
 	return cu, nil
 }
 
-func (s *Service) GetJobs(id int) ([]model.Job, error) {
+func (s *Service) GetJobsByCompanyId(id int) ([]model.Job, error) {
 	if id > 10 {
 		return nil, errors.New("id cannnot be greater")
 	}
@@ -80,5 +82,18 @@ func (s *Service) GetAllJobs() ([]model.Job, error) {
 		return nil, err
 	}
 	return AllJobs, nil
+
+}
+
+func (s *Service) GetJobByJobId(id int) (model.Job, error) {
+	if id > 10 {
+		return model.Job{}, errors.New("id cannnot be greater")
+	}
+	Companies, err := s.c.GetJobsByJobId(id)
+	if err != nil {
+		log.Error().Err(err).Msg("couldnot get company")
+		return model.Job{}, err
+	}
+	return Companies, nil
 
 }

@@ -37,7 +37,7 @@ func Connection() (*gorm.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("database is not connected: %w ", err)
 	}
-	db.Migrator().DropTable(&model.Job{}, &model.Company{}, &model.Job{})
+	//db.Migrator().DropTable(&model.User{}, &model.Company{}, &model.Job{})
 	err = db.Migrator().AutoMigrate(&model.User{})
 	if err != nil {
 		return nil, fmt.Errorf("auto migration failed: %w ", err)

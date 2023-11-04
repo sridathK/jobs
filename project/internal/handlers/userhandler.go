@@ -28,13 +28,13 @@ func NewHandler(a *auth.Auth, us services.UsersService, cs services.CompanyServi
 	return &handler{a: a, us: us, cs: cs}, nil
 
 }
-func (h *handler) userSignin(c *gin.Context) {
+func (h *handler) userSignup(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)
 	if !ok {
 		log.Error().Str("traceId", traceId).Msg("trace id not found in userSignin handler")
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 
@@ -51,7 +51,7 @@ func (h *handler) userSignin(c *gin.Context) {
 	err = validate.Struct(&userCreate)
 	if err != nil {
 		log.Error().Err(err).Msg("error in validating ")
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "invalid input"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "invalid input"})
 		return
 	}
 	us, err := h.us.UserSignup(userCreate)
@@ -64,13 +64,13 @@ func (h *handler) userSignin(c *gin.Context) {
 
 }
 
-func (h *handler) userLoginin(c *gin.Context) {
+func (h *handler) userLogin(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)
 	if !ok {
 		log.Error().Str("traceId", traceId).Msg("trace id not found in userSignin handler")
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 	var userLogin model.UserLogin
@@ -78,7 +78,7 @@ func (h *handler) userLoginin(c *gin.Context) {
 	err := json.NewDecoder(body).Decode(&userLogin)
 	if err != nil {
 		log.Error().Err(err).Msg("error in decoding")
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 
@@ -86,7 +86,7 @@ func (h *handler) userLoginin(c *gin.Context) {
 	err = validate.Struct(&userLogin)
 	if err != nil {
 		log.Error().Err(err).Msg("error in validating ")
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "invalid input"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "invalid input"})
 		return
 	}
 

@@ -21,6 +21,21 @@ type MockCompany struct {
 	recorder *MockCompanyMockRecorder
 }
 
+// GetJobsByJobId implements Company.
+func (*MockCompany) GetJobsByJobId(id int) (model.Job, error) {
+	panic("unimplemented")
+}
+
+// getJobsByJobId implements Company.
+func (*MockCompany) getJobsByJobId(id int) (model.Job, error) {
+	panic("unimplemented")
+}
+
+// getJobByJobId implements Company.
+func (*MockCompany) getJobByJobId(id int) (model.Job, error) {
+	panic("unimplemented")
+}
+
 // MockCompanyMockRecorder is the mock recorder for MockCompany.
 type MockCompanyMockRecorder struct {
 	mock *MockCompany

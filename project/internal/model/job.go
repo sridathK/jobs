@@ -12,7 +12,7 @@ type Job struct {
 
 type Company struct {
 	gorm.Model
-	CompanyName string `json:"company_name" validate:"required"`
+	CompanyName string `json:"company_name"  gorm:"unique"`
 	Adress      string `json:"company_adress" validate:"required"`
 	Domain      string `json:"domain" validate:"required"`
 }

@@ -11,6 +11,8 @@ type Repo struct {
 	db *gorm.DB
 }
 
+// GetJobsByJobId implements Company.
+
 func NewRepo(db *gorm.DB) (*Repo, error) {
 	if db == nil {
 		return nil, errors.New("db connection not given")

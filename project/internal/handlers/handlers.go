@@ -14,13 +14,14 @@ func Api(a *auth.Auth, s *services.Service) *gin.Engine {
 	//h := handler{a: a, us: s, cs: s}
 	m, _ := middlewear.NewMiddleWear(a)
 	r.Use(m.Log(), gin.Recovery())
-	r.POST("/signup", h.userSignin)
-	r.POST("/login", h.userLoginin)
-	r.POST("/createCompany", h.companyCreation)
-	r.GET("/getAllCompany", h.getAllCompany)
-	r.GET("/getCompany/:company_id", h.getCompany)
-	r.POST("/companies/:company_id/jobs", h.postJob)
-	r.GET("/companies/:company_id/jobs", h.getJob)
-	r.GET("/jobs", h.getAllJob)
+	r.POST("/api/register", h.userSignup)
+	r.POST("/api/login", h.userLogin)
+	r.POST("/api/companies", m.Auth(h.companyCreation))
+	r.GET("/api/companies", m.Auth(h.getAllCompany))
+	r.GET(" /api/company/:company_id", m.Auth(h.getCompanyById))
+	r.POST("/api/companies/:company_id/jobs", m.Auth(h.postJobByCompany))
+	r.GET("/api/companies/:company_id/jobs", m.Auth(h.getJobByCompany))
+	r.GET("/api/jobs", m.Auth(h.getAllJob))
+	r.GET("/api/jobs/:job_id", m.Auth(h.getJobByJobId))
 	return r
 }
