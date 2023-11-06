@@ -40,9 +40,8 @@ func Test_handler_companyCreation(t *testing.T) {
 			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.CompanyService) {
 				rr := httptest.NewRecorder()
 				c, _ := gin.CreateTestContext(rr)
-				httpRequest, _ := http.NewRequest(http.MethodGet, "http://test.com", strings.NewReader(`{"name":"",
-			"email":    "name@gmail.com",
-			"password": "hfhhfhfh"}`))
+				httpRequest, _ := http.NewRequest(http.MethodGet, "http://test.com", strings.NewReader(`{"company_name":"",
+			"domain": "hfhhfhfh"}`))
 				ctx := httpRequest.Context()
 				ctx = context.WithValue(ctx, middlewear.TraceIdKey, "123")
 				httpRequest = httpRequest.WithContext(ctx)
@@ -57,7 +56,7 @@ func Test_handler_companyCreation(t *testing.T) {
 			setup: func() (*gin.Context, *httptest.ResponseRecorder, services.CompanyService) {
 				rr := httptest.NewRecorder()
 				c, _ := gin.CreateTestContext(rr)
-				httpRequest, _ := http.NewRequest(http.MethodGet, "http://test.com:8080", strings.NewReader(`{"company_name":"names",
+				httpRequest, _ := http.NewRequest(http.MethodGet, "http://test.com:8080", strings.NewReader(`{"company_name":"namevs",
 				"company_adress":    "name@gmail.com",
 				"domain": "hfhhfhfh"}`))
 				ctx := httpRequest.Context()
@@ -145,7 +144,7 @@ func Test_handler_getAllCompany(t *testing.T) {
 	}
 }
 
-func Test_handler_getCompany(t *testing.T) {
+func Test_handler_getCompanyById(t *testing.T) {
 
 	tests := []struct {
 		name               string
@@ -179,7 +178,7 @@ func Test_handler_getCompany(t *testing.T) {
 				mc := gomock.NewController(t)
 				ms := services.NewMockCompanyService(mc)
 
-				ms.EXPECT().GetCompany(gomock.Any()).Return(model.Company{}, errors.New("test service error")).AnyTimes()
+				ms.EXPECT().GetCompanyById(gomock.Any()).Return(model.Company{}, errors.New("test service error")).AnyTimes()
 
 				return c, rr, ms
 			},
@@ -201,7 +200,7 @@ func Test_handler_getCompany(t *testing.T) {
 				mc := gomock.NewController(t)
 				ms := services.NewMockCompanyService(mc)
 
-				ms.EXPECT().GetCompany(gomock.Any()).Return(model.Company{}, nil).AnyTimes()
+				ms.EXPECT().GetCompanyById(gomock.Any()).Return(model.Company{}, nil).AnyTimes()
 
 				return c, rr, ms
 			},
@@ -312,7 +311,7 @@ func Test_handler_postJob(t *testing.T) {
 	}
 }
 
-func Test_handler_getJob(t *testing.T) {
+func Test_handler_getJobByCompany(t *testing.T) {
 
 	tests := []struct {
 		name               string
@@ -346,7 +345,7 @@ func Test_handler_getJob(t *testing.T) {
 				mc := gomock.NewController(t)
 				ms := services.NewMockCompanyService(mc)
 
-				ms.EXPECT().GetJobs(gomock.Any()).Return([]model.Job{}, errors.New("test service error")).AnyTimes()
+				ms.EXPECT().GetJobsByCompanyId(gomock.Any()).Return([]model.Job{}, errors.New("test service error")).AnyTimes()
 
 				return c, rr, ms
 			},
@@ -368,7 +367,7 @@ func Test_handler_getJob(t *testing.T) {
 				mc := gomock.NewController(t)
 				ms := services.NewMockCompanyService(mc)
 
-				ms.EXPECT().GetJobs(gomock.Any()).Return([]model.Job{}, nil).AnyTimes()
+				ms.EXPECT().GetJobsByCompanyId(gomock.Any()).Return([]model.Job{}, nil).AnyTimes()
 
 				return c, rr, ms
 			},

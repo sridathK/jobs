@@ -22,14 +22,14 @@ type MockCompanyService struct {
 }
 
 // GetJobsByCompanyId implements CompanyService.
-func (*MockCompanyService) GetJobsByCompanyId(id int) ([]model.Job, error) {
-	panic("unimplemented")
-}
+// func (*MockCompanyService) GetJobsByCompanyId(id int) ([]model.Job, error) {
+// 	panic("unimplemented")
+// }
 
 // GetCompanyById implements CompanyService.
-func (*MockCompanyService) GetCompanyById(id int) (model.Company, error) {
-	panic("unimplemented")
-}
+// func (*MockCompanyService) GetCompanyById(id int) (model.Company, error) {
+// 	panic("unimplemented")
+// }
 
 // GetJobByJobId implements CompanyService.
 func (*MockCompanyService) GetJobByJobId(id int) (model.Job, error) {
@@ -104,22 +104,22 @@ func (mr *MockCompanyServiceMockRecorder) GetAllJobs() *gomock.Call {
 }
 
 // GetCompany mocks base method.
-func (m *MockCompanyService) GetCompany(id int) (model.Company, error) {
+func (m *MockCompanyService) GetCompanyById(id int) (model.Company, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCompany", id)
+	ret := m.ctrl.Call(m, "GetCompanyById", id)
 	ret0, _ := ret[0].(model.Company)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetCompany indicates an expected call of GetCompany.
-func (mr *MockCompanyServiceMockRecorder) GetCompany(id any) *gomock.Call {
+func (mr *MockCompanyServiceMockRecorder) GetCompanyById(id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCompany", reflect.TypeOf((*MockCompanyService)(nil).GetCompany), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCompanyById", reflect.TypeOf((*MockCompanyService)(nil).GetCompanyById), id)
 }
 
 // GetJobs mocks base method.
-func (m *MockCompanyService) GetJobs(id int) ([]model.Job, error) {
+func (m *MockCompanyService) GetJobsByCompanyId(id int) ([]model.Job, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetJobs", id)
 	ret0, _ := ret[0].([]model.Job)
@@ -128,9 +128,9 @@ func (m *MockCompanyService) GetJobs(id int) ([]model.Job, error) {
 }
 
 // GetJobs indicates an expected call of GetJobs.
-func (mr *MockCompanyServiceMockRecorder) GetJobs(id any) *gomock.Call {
+func (mr *MockCompanyServiceMockRecorder) GetJobsByCompanyId(id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetJobs", reflect.TypeOf((*MockCompanyService)(nil).GetJobs), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetJobs", reflect.TypeOf((*MockCompanyService)(nil).GetJobsByCompanyId), id)
 }
 
 // JobCreate mocks base method.
