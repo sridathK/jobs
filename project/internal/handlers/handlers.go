@@ -19,9 +19,10 @@ func Api(a *auth.Auth, s *services.Service) *gin.Engine {
 	r.POST("/api/companies", m.Auth(h.companyCreation))
 	r.GET("/api/companies", m.Auth(h.getAllCompany))
 	r.GET(" /api/company/:company_id", m.Auth(h.getCompanyById))
-	r.POST("/api/companies/:company_id/jobs", m.Auth(h.postJobByCompany))
+	r.POST("/api/companies/:company_id/jobs", h.postJobByCompany)
 	r.GET("/api/companies/:company_id/jobs", m.Auth(h.getJobByCompany))
 	r.GET("/api/jobs", m.Auth(h.getAllJob))
 	r.GET("/api/jobs/:job_id", m.Auth(h.getJobByJobId))
+
 	return r
 }
