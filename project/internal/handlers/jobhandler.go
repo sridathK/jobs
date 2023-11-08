@@ -203,7 +203,41 @@ func (h *handler) getJobByJobId(c *gin.Context) {
 		return
 	}
 
-	us, err := h.cs.GetJobByJobId(id)
+	us, err := h.cs.GetJobByJobId(uint(id))
+	if err != nil {
+		log.Error().Err(err).Str("Trace Id", traceId).Msg("geting all jobs problem from db")
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+	c.JSON(http.StatusOK, us)
+}
+
+func (h *handler) processingJobInput(c *gin.Context) {
+	ctx := c.Request.Context()
+	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)
+	if !ok {
+		log.Error().Str("traceId", traceId).Msg("trace id not found in  handler")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+	var JobRequest []model.JobRequest
+
+	body := c.Request.Body
+	err := json.NewDecoder(body).Decode(&JobRequest)
+	if err != nil {
+		log.Error().Err(err).Msg("error in decoding")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+	// validate := validator.New()
+	// err = validate.Struct(&JobRequest)
+	// if err != nil {
+	// 	log.Error().Err(err).Msg("error in validating ")
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": http.StatusText(http.StatusInternalServerError)})
+	// 	return
+	// }
+
+	us, err := h.cs.ProcessingJobDetails(JobRequest)
 	if err != nil {
 		log.Error().Err(err).Str("Trace Id", traceId).Msg("geting all jobs problem from db")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
