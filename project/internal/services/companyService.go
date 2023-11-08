@@ -2,10 +2,10 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	"project/internal/model"
 	"slices"
 	"strconv"
+	"sync"
 
 	"github.com/rs/zerolog/log"
 )
@@ -175,25 +175,38 @@ func (s *Service) GetJobByJobId(id uint) (model.Job, error) {
 // }
 
 func (s *Service) ProcessingJobDetails(m []model.JobRequest) ([]model.Job, error) {
-	//wg := new(sync.WaitGroup)
+	wg := new(sync.WaitGroup)
+	// wg1 := new(sync.WaitGroup)
+	c1 := make(chan model.Job)
 	var JobsResult []model.Job
-	// var JobRequest []model.JobRequest
-	fmt.Println(s.c.GetJobsByJobId(6))
-	for _, v := range m {
-		Jobs, err := s.c.GetJobsByJobId(v.JobId)
-		if err != nil {
-			return nil, errors.New("couldnot retrieve 'all jobs' from db")
-		}
+	go func() {
 		for _, v := range m {
-			result1 := Processing5Data(Jobs, v)
-			result2 := ProcessingOther5Data(Jobs, v)
+			wg.Add(1)
+			go func(v model.JobRequest) {
+				defer wg.Done()
+				Jobs, _ := s.c.GetJobsByJobId(v.JobId)
+				// if err != nil {
+				// 	return nil, errors.New("couldnot retrieve 'all jobs' from db")
+				// }
+				// wg1.Add(1)
 
-			if result1 && result2 {
-				JobsResult = append(JobsResult, Jobs)
-				//return JobsResult, nil
-			}
+				result1 := Processing5Data(Jobs, v)
+				result2 := ProcessingOther5Data(Jobs, v)
+				//wg1.Wait()
+
+				if result1 && result2 {
+					//JobsResult = append(JobsResult, Jobs)
+					c1 <- Jobs
+				}
+
+			}(v)
+
 		}
-
+		wg.Wait()
+		close(c1)
+	}()
+	for val := range c1 {
+		JobsResult = append(JobsResult, val)
 	}
 
 	return JobsResult, nil
