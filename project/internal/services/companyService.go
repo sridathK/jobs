@@ -15,7 +15,7 @@ type CompanyService interface {
 	CompanyCreate(nc model.CreateCompany) (model.Company, error)
 	GetAllCompanies() ([]model.Company, error)
 	GetCompanyById(id int) (model.Company, error)
-	JobCreate(nj model.CreateJob, id uint64) (uint, error)
+	JobCreate(nj model.CreateJob, id uint64) (model.JobResponse, error)
 	GetJobsByCompanyId(id int) ([]model.Job, error)
 	GetAllJobs() ([]model.Job, error)
 	GetJobByJobId(id uint) (model.Job, error)
@@ -57,7 +57,8 @@ func (s *Service) GetCompanyById(id int) (model.Company, error) {
 
 }
 
-func (s *Service) JobCreate(nj model.CreateJob, id uint64) (uint, error) {
+func (s *Service) JobCreate(nj model.CreateJob, id uint64) (model.JobResponse, error) {
+	// var response model.JobResponse
 	var locations []model.Location
 	var qualifications []model.Qualification
 	var technologies []model.Technology
@@ -92,10 +93,10 @@ func (s *Service) JobCreate(nj model.CreateJob, id uint64) (uint, error) {
 	cu, err := s.c.CreateJob(job)
 	if err != nil {
 		log.Error().Err(err).Msg("couldnot create job")
-		return 0, errors.New("job creation failed")
+		return model.JobResponse{}, errors.New("job creation failed")
 	}
-
-	return cu, nil
+	res := model.JobResponse{ID: cu.ID}
+	return res, nil
 }
 
 func (s *Service) GetJobsByCompanyId(id int) ([]model.Job, error) {
