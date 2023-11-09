@@ -21,26 +21,6 @@ type MockCompanyService struct {
 	recorder *MockCompanyServiceMockRecorder
 }
 
-// GetJobsByCompanyId implements CompanyService.
-// func (*MockCompanyService) GetJobsByCompanyId(id int) ([]model.Job, error) {
-// 	panic("unimplemented")
-// }
-
-// GetCompanyById implements CompanyService.
-// func (*MockCompanyService) GetCompanyById(id int) (model.Company, error) {
-// 	panic("unimplemented")
-// }
-
-// GetJobByJobId implements CompanyService.
-func (*MockCompanyService) GetJobByJobId(id int) (model.Job, error) {
-	panic("unimplemented")
-}
-
-// getJobByJobId implements CompanyService.
-func (*MockCompanyService) getJobByJobId(id int) (model.Job, error) {
-	panic("unimplemented")
-}
-
 // MockCompanyServiceMockRecorder is the mock recorder for MockCompanyService.
 type MockCompanyServiceMockRecorder struct {
 	mock *MockCompanyService
@@ -103,7 +83,7 @@ func (mr *MockCompanyServiceMockRecorder) GetAllJobs() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllJobs", reflect.TypeOf((*MockCompanyService)(nil).GetAllJobs))
 }
 
-// GetCompany mocks base method.
+// GetCompanyById mocks base method.
 func (m *MockCompanyService) GetCompanyById(id int) (model.Company, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCompanyById", id)
@@ -112,32 +92,47 @@ func (m *MockCompanyService) GetCompanyById(id int) (model.Company, error) {
 	return ret0, ret1
 }
 
-// GetCompany indicates an expected call of GetCompany.
+// GetCompanyById indicates an expected call of GetCompanyById.
 func (mr *MockCompanyServiceMockRecorder) GetCompanyById(id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCompanyById", reflect.TypeOf((*MockCompanyService)(nil).GetCompanyById), id)
 }
 
-// GetJobs mocks base method.
+// GetJobByJobId mocks base method.
+func (m *MockCompanyService) GetJobByJobId(id uint) (model.Job, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetJobByJobId", id)
+	ret0, _ := ret[0].(model.Job)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetJobByJobId indicates an expected call of GetJobByJobId.
+func (mr *MockCompanyServiceMockRecorder) GetJobByJobId(id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetJobByJobId", reflect.TypeOf((*MockCompanyService)(nil).GetJobByJobId), id)
+}
+
+// GetJobsByCompanyId mocks base method.
 func (m *MockCompanyService) GetJobsByCompanyId(id int) ([]model.Job, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetJobs", id)
+	ret := m.ctrl.Call(m, "GetJobsByCompanyId", id)
 	ret0, _ := ret[0].([]model.Job)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetJobs indicates an expected call of GetJobs.
+// GetJobsByCompanyId indicates an expected call of GetJobsByCompanyId.
 func (mr *MockCompanyServiceMockRecorder) GetJobsByCompanyId(id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetJobs", reflect.TypeOf((*MockCompanyService)(nil).GetJobsByCompanyId), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetJobsByCompanyId", reflect.TypeOf((*MockCompanyService)(nil).GetJobsByCompanyId), id)
 }
 
 // JobCreate mocks base method.
-func (m *MockCompanyService) JobCreate(nj model.CreateJob, id uint64) (model.Job, error) {
+func (m *MockCompanyService) JobCreate(nj model.CreateJob, id uint64) (model.JobResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "JobCreate", nj, id)
-	ret0, _ := ret[0].(model.Job)
+	ret0, _ := ret[0].(model.JobResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -146,4 +141,19 @@ func (m *MockCompanyService) JobCreate(nj model.CreateJob, id uint64) (model.Job
 func (mr *MockCompanyServiceMockRecorder) JobCreate(nj, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JobCreate", reflect.TypeOf((*MockCompanyService)(nil).JobCreate), nj, id)
+}
+
+// ProcessingJobDetails mocks base method.
+func (m *MockCompanyService) ProcessingJobDetails(arg0 []model.JobRequest) ([]model.Job, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ProcessingJobDetails", arg0)
+	ret0, _ := ret[0].([]model.Job)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ProcessingJobDetails indicates an expected call of ProcessingJobDetails.
+func (mr *MockCompanyServiceMockRecorder) ProcessingJobDetails(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessingJobDetails", reflect.TypeOf((*MockCompanyService)(nil).ProcessingJobDetails), arg0)
 }

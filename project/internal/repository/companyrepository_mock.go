@@ -21,21 +21,6 @@ type MockCompany struct {
 	recorder *MockCompanyMockRecorder
 }
 
-// GetJobsByJobId implements Company.
-func (*MockCompany) GetJobsByJobId(id int) (model.Job, error) {
-	panic("unimplemented")
-}
-
-// getJobsByJobId implements Company.
-func (*MockCompany) getJobsByJobId(id int) (model.Job, error) {
-	panic("unimplemented")
-}
-
-// getJobByJobId implements Company.
-func (*MockCompany) getJobByJobId(id int) (model.Job, error) {
-	panic("unimplemented")
-}
-
 // MockCompanyMockRecorder is the mock recorder for MockCompany.
 type MockCompanyMockRecorder struct {
 	mock *MockCompany
@@ -128,6 +113,21 @@ func (mr *MockCompanyMockRecorder) GetCompany(id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCompany", reflect.TypeOf((*MockCompany)(nil).GetCompany), id)
 }
 
+// GetJobTypeById mocks base method.
+func (m *MockCompany) GetJobTypeById(id uint) (model.JobType, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetJobTypeById", id)
+	ret0, _ := ret[0].(model.JobType)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetJobTypeById indicates an expected call of GetJobTypeById.
+func (mr *MockCompanyMockRecorder) GetJobTypeById(id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetJobTypeById", reflect.TypeOf((*MockCompany)(nil).GetJobTypeById), id)
+}
+
 // GetJobs mocks base method.
 func (m *MockCompany) GetJobs(id int) ([]model.Job, error) {
 	m.ctrl.T.Helper()
@@ -141,4 +141,79 @@ func (m *MockCompany) GetJobs(id int) ([]model.Job, error) {
 func (mr *MockCompanyMockRecorder) GetJobs(id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetJobs", reflect.TypeOf((*MockCompany)(nil).GetJobs), id)
+}
+
+// GetJobsByJobId mocks base method.
+func (m *MockCompany) GetJobsByJobId(id uint) (model.Job, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetJobsByJobId", id)
+	ret0, _ := ret[0].(model.Job)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetJobsByJobId indicates an expected call of GetJobsByJobId.
+func (mr *MockCompanyMockRecorder) GetJobsByJobId(id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetJobsByJobId", reflect.TypeOf((*MockCompany)(nil).GetJobsByJobId), id)
+}
+
+// GetLocationById mocks base method.
+func (m *MockCompany) GetLocationById(id uint) (model.Location, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLocationById", id)
+	ret0, _ := ret[0].(model.Location)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLocationById indicates an expected call of GetLocationById.
+func (mr *MockCompanyMockRecorder) GetLocationById(id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLocationById", reflect.TypeOf((*MockCompany)(nil).GetLocationById), id)
+}
+
+// GetQualificationById mocks base method.
+func (m *MockCompany) GetQualificationById(id uint) (model.Qualification, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetQualificationById", id)
+	ret0, _ := ret[0].(model.Qualification)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetQualificationById indicates an expected call of GetQualificationById.
+func (mr *MockCompanyMockRecorder) GetQualificationById(id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetQualificationById", reflect.TypeOf((*MockCompany)(nil).GetQualificationById), id)
+}
+
+// GetShiftById mocks base method.
+func (m *MockCompany) GetShiftById(id uint) (model.Shift, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetShiftById", id)
+	ret0, _ := ret[0].(model.Shift)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetShiftById indicates an expected call of GetShiftById.
+func (mr *MockCompanyMockRecorder) GetShiftById(id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetShiftById", reflect.TypeOf((*MockCompany)(nil).GetShiftById), id)
+}
+
+// GetTechnologyById mocks base method.
+func (m *MockCompany) GetTechnologyById(id uint) (model.Technology, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTechnologyById", id)
+	ret0, _ := ret[0].(model.Technology)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTechnologyById indicates an expected call of GetTechnologyById.
+func (mr *MockCompanyMockRecorder) GetTechnologyById(id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTechnologyById", reflect.TypeOf((*MockCompany)(nil).GetTechnologyById), id)
 }

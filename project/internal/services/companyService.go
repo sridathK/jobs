@@ -90,6 +90,7 @@ func (s *Service) JobCreate(nj model.CreateJob, id uint64) (model.JobResponse, e
 
 	job := model.Job{JobTitle: nj.JobTitle, JobSalary: nj.JobSalary, Uid: id, MinNoticePeriod: nj.MinNoticePeriod, MaxNoticePeriod: nj.MaxNoticePeriod, Budget: nj.Budget, WorkMode: nj.WorkMode,
 		Description: nj.Description, MinExperience: nj.MinExperience, MaxExperience: nj.MaxExperience, JobLocations: locations, Technology: technologies, Qualification: qualifications, Shift: shifts, JobType: JobTypes}
+
 	cu, err := s.c.CreateJob(job)
 	if err != nil {
 		log.Error().Err(err).Msg("couldnot create job")
@@ -273,6 +274,7 @@ func ProcessingOther5Data(v model.Job, m model.JobRequest) bool {
 }
 
 func containsLocation(job []model.Location, request []string) bool {
+
 	var lv []string
 
 	for _, a := range job {
