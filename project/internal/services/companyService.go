@@ -1,8 +1,12 @@
 package services
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"project/internal/model"
+	redisconn "project/internal/redisConn"
 	"slices"
 	"strconv"
 	"sync"
@@ -181,17 +185,53 @@ func (s *Service) ProcessingJobDetails(m []model.JobRequest) ([]model.Job, error
 	// wg1 := new(sync.WaitGroup)
 	c1 := make(chan model.Job)
 	var JobsResult []model.Job
+	var Jobs model.Job
+	//var JobsMap map[uint]model.Job
+	//JobsMap := make(map[uint]model.Job)
+	// for _, v := range m {
+	// 	_, ok := JobsMap[v.JobId]
+	// 	if !ok {
+	// 		Jobs, _ := s.c.GetJobsByJobId(v.JobId)
+	// 		JobsMap[v.JobId] = Jobs
+	// 	}
+	// }
+	context := context.Background()
+	redis := redisconn.ReddisConc()
+	for _, v := range m {
+
+		//jobId := string(v.JobId)
+		jobId := strconv.FormatUint(uint64(v.JobId), 10)
+		_, err := redis.Get(context, jobId).Result()
+		if err != nil {
+			Jobs, _ := s.c.GetJobsByJobId(v.JobId)
+			JobsJson, err := json.Marshal(Jobs)
+			if err != nil {
+				fmt.Println("Error marshalling JSON:", err)
+				return nil, errors.New("error marshalling JSON")
+			}
+			err = redis.Set(context, jobId, JobsJson, 0).Err()
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+
 	go func() {
 		for _, v := range m {
 			wg.Add(1)
 			go func(v model.JobRequest) {
+				jobId := strconv.FormatUint(uint64(v.JobId), 10)
 				defer wg.Done()
-				Jobs, _ := s.c.GetJobsByJobId(v.JobId)
+				val, _ := redis.Get(context, jobId).Result()
 				// if err != nil {
 				// 	return nil, errors.New("couldnot retrieve 'all jobs' from db")
 				// }
 				// wg1.Add(1)
-
+				//err := json.NewDecoder(val).Decode(&Jobs)
+				err := json.Unmarshal([]byte(val), &Jobs)
+				if err != nil {
+					fmt.Println("Error Unmarshalling JSON:", err)
+				}
 				result1 := Processing5Data(Jobs, v)
 				result2 := ProcessingOther5Data(Jobs, v)
 				//wg1.Wait()

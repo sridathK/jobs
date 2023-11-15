@@ -11,6 +11,7 @@ import (
 	"project/internal/services"
 
 	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -19,6 +20,7 @@ func main() {
 	if err != nil {
 		log.Panic().Err(err).Send()
 	}
+
 }
 func startApp() error {
 	log.Info().Msg("started main")
