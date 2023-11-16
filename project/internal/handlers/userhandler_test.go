@@ -81,7 +81,7 @@ func Test_handler_userSignin(t *testing.T) {
 			gin.SetMode(gin.TestMode)
 			c, rr, ms := tt.setup()
 
-			h := &handler{
+			h := &UserHandler{
 				us: ms,
 			}
 
@@ -137,7 +137,7 @@ func Test_handler_userLoginin(t *testing.T) {
 			gin.SetMode(gin.TestMode)
 			c, rr, ms := tt.setup()
 
-			h := &handler{
+			h := &UserHandler{
 				us: ms,
 			}
 

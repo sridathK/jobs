@@ -2,9 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+	"project/internal/auth"
 	"project/internal/middlewear"
 	"project/internal/model"
+	"project/internal/services"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +15,32 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (h *handler) companyCreation(c *gin.Context) {
+type JobHandler struct {
+	a  *auth.Auth
+	cs services.CompanyService
+}
+
+func NewJobHandler(a *auth.Auth, cs services.CompanyService) (JobHandlerIn, error) {
+	if cs == nil {
+		return nil, errors.New("service implementation not given")
+	}
+
+	return &JobHandler{a: a, cs: cs}, nil
+
+}
+
+type JobHandlerIn interface {
+	companyCreation(c *gin.Context)
+	getAllCompany(c *gin.Context)
+	getCompanyById(c *gin.Context)
+	postJobByCompany(c *gin.Context)
+	getJobByCompany(c *gin.Context)
+	getAllJob(c *gin.Context)
+	getJobByJobId(c *gin.Context)
+	processingJobInput(c *gin.Context)
+}
+
+func (h *JobHandler) companyCreation(c *gin.Context) {
 
 	ctx := c.Request.Context()
 
@@ -60,7 +88,7 @@ func (h *handler) companyCreation(c *gin.Context) {
 
 }
 
-func (h *handler) getAllCompany(c *gin.Context) {
+func (h *JobHandler) getAllCompany(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)
@@ -81,7 +109,7 @@ func (h *handler) getAllCompany(c *gin.Context) {
 
 }
 
-func (h *handler) getCompanyById(c *gin.Context) {
+func (h *JobHandler) getCompanyById(c *gin.Context) {
 
 	ctx := c.Request.Context()
 	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)
@@ -106,7 +134,7 @@ func (h *handler) getCompanyById(c *gin.Context) {
 	c.JSON(http.StatusOK, us)
 }
 
-func (h *handler) postJobByCompany(c *gin.Context) {
+func (h *JobHandler) postJobByCompany(c *gin.Context) {
 	ctx := c.Request.Context()
 	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)
 	if !ok {
@@ -147,7 +175,7 @@ func (h *handler) postJobByCompany(c *gin.Context) {
 
 }
 
-func (h *handler) getJobByCompany(c *gin.Context) {
+func (h *JobHandler) getJobByCompany(c *gin.Context) {
 	ctx := c.Request.Context()
 	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)
 	if !ok {
@@ -171,7 +199,7 @@ func (h *handler) getJobByCompany(c *gin.Context) {
 
 }
 
-func (h *handler) getAllJob(c *gin.Context) {
+func (h *JobHandler) getAllJob(c *gin.Context) {
 	ctx := c.Request.Context()
 	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)
 	if !ok {
@@ -189,7 +217,7 @@ func (h *handler) getAllJob(c *gin.Context) {
 	c.JSON(http.StatusOK, us)
 
 }
-func (h *handler) getJobByJobId(c *gin.Context) {
+func (h *JobHandler) getJobByJobId(c *gin.Context) {
 	ctx := c.Request.Context()
 	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)
 	if !ok {
@@ -212,7 +240,7 @@ func (h *handler) getJobByJobId(c *gin.Context) {
 	c.JSON(http.StatusOK, us)
 }
 
-func (h *handler) processingJobInput(c *gin.Context) {
+func (h *JobHandler) processingJobInput(c *gin.Context) {
 	ctx := c.Request.Context()
 	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)
 	if !ok {

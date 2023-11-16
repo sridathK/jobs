@@ -1,6 +1,24 @@
 package repository
 
-import "project/internal/model"
+import (
+	"errors"
+	"project/internal/model"
+
+	"gorm.io/gorm"
+)
+
+type CompanyRepo struct {
+	db *gorm.DB
+}
+
+func NewCompanyRepo(db *gorm.DB) (Company, error) {
+	if db == nil {
+		return nil, errors.New("db connection not given")
+	}
+
+	return &CompanyRepo{db: db}, nil
+
+}
 
 //go:generate mockgen -source=jobDao.go -destination=companyrepository_mock.go -package=repository
 type Company interface {
@@ -18,7 +36,7 @@ type Company interface {
 	GetJobTypeById(id uint) (model.JobType, error)
 }
 
-func (r *Repo) CreateCompany(u model.Company) (model.Company, error) {
+func (r *CompanyRepo) CreateCompany(u model.Company) (model.Company, error) {
 	err := r.db.Create(&u).Error
 	if err != nil {
 		return model.Company{}, err
@@ -26,7 +44,7 @@ func (r *Repo) CreateCompany(u model.Company) (model.Company, error) {
 	return u, nil
 }
 
-func (r *Repo) GetAllCompany() ([]model.Company, error) {
+func (r *CompanyRepo) GetAllCompany() ([]model.Company, error) {
 	var s []model.Company
 	err := r.db.Find(&s).Error
 	if err != nil {
@@ -36,7 +54,7 @@ func (r *Repo) GetAllCompany() ([]model.Company, error) {
 	return s, nil
 }
 
-func (r *Repo) GetCompany(id int) (model.Company, error) {
+func (r *CompanyRepo) GetCompany(id int) (model.Company, error) {
 	var m model.Company
 	id1 := uint64(id)
 	tx := r.db.Where("id = ?", id1)
@@ -48,7 +66,7 @@ func (r *Repo) GetCompany(id int) (model.Company, error) {
 
 }
 
-func (r *Repo) CreateJob(j model.Job) (model.Job, error) {
+func (r *CompanyRepo) CreateJob(j model.Job) (model.Job, error) {
 	err := r.db.Create(&j).Error
 	if err != nil {
 		return model.Job{}, err
@@ -56,7 +74,7 @@ func (r *Repo) CreateJob(j model.Job) (model.Job, error) {
 	return j, nil
 }
 
-func (r *Repo) GetJobs(id int) ([]model.Job, error) {
+func (r *CompanyRepo) GetJobs(id int) ([]model.Job, error) {
 	var m []model.Job
 
 	tx := r.db.Where("uid = ?", id)
@@ -68,7 +86,7 @@ func (r *Repo) GetJobs(id int) ([]model.Job, error) {
 
 }
 
-func (r *Repo) GetAllJobs() ([]model.Job, error) {
+func (r *CompanyRepo) GetAllJobs() ([]model.Job, error) {
 	var s []model.Job
 	err := r.db.Find(&s).Error
 	if err != nil {
@@ -78,7 +96,7 @@ func (r *Repo) GetAllJobs() ([]model.Job, error) {
 	return s, nil
 }
 
-func (r *Repo) GetJobsByJobId(id uint) (model.Job, error) {
+func (r *CompanyRepo) GetJobsByJobId(id uint) (model.Job, error) {
 	var m model.Job
 
 	tx := r.db.Preload("Qualification").Preload("JobLocations").Preload("Technology").Preload("Shift").Preload("JobType").Where("id = ?", id)
@@ -90,7 +108,7 @@ func (r *Repo) GetJobsByJobId(id uint) (model.Job, error) {
 
 }
 
-func (r *Repo) GetLocationById(id uint) (model.Location, error) {
+func (r *CompanyRepo) GetLocationById(id uint) (model.Location, error) {
 	var l model.Location
 
 	tx := r.db.Where("id = ?", id)
@@ -102,7 +120,7 @@ func (r *Repo) GetLocationById(id uint) (model.Location, error) {
 
 }
 
-func (r *Repo) GetQualificationById(id uint) (model.Qualification, error) {
+func (r *CompanyRepo) GetQualificationById(id uint) (model.Qualification, error) {
 	var l model.Qualification
 
 	tx := r.db.Where("id = ?", id)
@@ -113,7 +131,7 @@ func (r *Repo) GetQualificationById(id uint) (model.Qualification, error) {
 	return l, nil
 }
 
-func (r *Repo) GetTechnologyById(id uint) (model.Technology, error) {
+func (r *CompanyRepo) GetTechnologyById(id uint) (model.Technology, error) {
 	var l model.Technology
 
 	tx := r.db.Where("id = ?", id)
@@ -124,7 +142,7 @@ func (r *Repo) GetTechnologyById(id uint) (model.Technology, error) {
 	return l, nil
 }
 
-func (r *Repo) GetShiftById(id uint) (model.Shift, error) {
+func (r *CompanyRepo) GetShiftById(id uint) (model.Shift, error) {
 	var l model.Shift
 
 	tx := r.db.Where("id = ?", id)
@@ -135,7 +153,7 @@ func (r *Repo) GetShiftById(id uint) (model.Shift, error) {
 	return l, nil
 }
 
-func (r *Repo) GetJobTypeById(id uint) (model.JobType, error) {
+func (r *CompanyRepo) GetJobTypeById(id uint) (model.JobType, error) {
 	var l model.JobType
 
 	tx := r.db.Where("id = ?", id)

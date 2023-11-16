@@ -7,6 +7,7 @@ import (
 	"project/internal/auth"
 	"project/internal/database"
 	"project/internal/handlers"
+	redisconn "project/internal/redisConn"
 	"project/internal/repository"
 	"project/internal/services"
 
@@ -50,20 +51,33 @@ func startApp() error {
 	if err != nil {
 		return err
 	}
-	repo, err := repository.NewRepo(db)
+	repou, err := repository.NewUserRepo(db)
+	if err != nil {
+		return err
+	}
+	repoc, err := repository.NewCompanyRepo(db)
 	if err != nil {
 		return err
 	}
 
-	se, err := services.NewService(repo, repo)
+	con := redisconn.ReddisConc()
+	re := redisconn.NewRDBLayer(con)
 
+	//se, err := services.NewService(repo, repo,re)
+
+	sec, err := services.NewCompanyServiceImp(repoc, re)
+	if err != nil {
+		return err
+	}
+
+	seu, err := services.NewUserServiceImp(repou)
 	if err != nil {
 		return err
 	}
 
 	api := http.Server{ //server config and settimngs
 		Addr:    ":8090",
-		Handler: handlers.Api(a, se),
+		Handler: handlers.Api(a, seu, sec),
 	}
 	api.ListenAndServe()
 

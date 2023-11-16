@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"project/internal/model"
+	redisconn "project/internal/redisConn"
 	"project/internal/repository"
 	"reflect"
 	"testing"
@@ -51,13 +52,14 @@ func TestService_CompanyCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockCompanyRepo := repository.NewMockCompany(mc)
-			mockUserRepo := repository.NewMockUsers(mc)
+			//mockUserRepo := repository.NewMockUsers(mc)
+			mockRedis := redisconn.NewMockCaching(mc)
 
 			companyModel := model.Company{CompanyName: tt.args.nc.CompanyName, Adress: tt.args.nc.Adress, Domain: tt.args.nc.Domain}
 			if tt.mockRepoResponse != nil {
 				mockCompanyRepo.EXPECT().CreateCompany(companyModel).Return(tt.mockRepoResponse()).AnyTimes()
 			}
-			s, _ := NewService(mockUserRepo, mockCompanyRepo)
+			s, _ := NewCompanyServiceImp(mockCompanyRepo, mockRedis)
 			got, err := s.CompanyCreate(tt.args.nc)
 
 			if (err != nil) != tt.wantErr {
@@ -110,12 +112,13 @@ func TestService_GetCompany(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockCompanyRepo := repository.NewMockCompany(mc)
-			mockUserRepo := repository.NewMockUsers(mc)
+			//mockUserRepo := repository.NewMockUsers(mc)
+			mockRedis := redisconn.NewMockCaching(mc)
 
 			if tt.mockRepoResponse != nil {
 				mockCompanyRepo.EXPECT().GetCompany(tt.args.id).Return(tt.mockRepoResponse()).AnyTimes()
 			}
-			s, _ := NewService(mockUserRepo, mockCompanyRepo)
+			s, _ := NewCompanyServiceImp(mockCompanyRepo, mockRedis)
 			got, err := s.GetCompanyById(tt.args.id)
 
 			if (err != nil) != tt.wantErr {
@@ -159,12 +162,13 @@ func TestService_GetAllCompanies(t *testing.T) {
 
 			mc := gomock.NewController(t)
 			mockCompanyRepo := repository.NewMockCompany(mc)
-			mockUserRepo := repository.NewMockUsers(mc)
+			//	mockUserRepo := repository.NewMockUsers(mc)\
+			mockRedis := redisconn.NewMockCaching(mc)
 
 			if tt.mockRepoResponse != nil {
 				mockCompanyRepo.EXPECT().GetAllCompany().Return(tt.mockRepoResponse()).AnyTimes()
 			}
-			s, _ := NewService(mockUserRepo, mockCompanyRepo)
+			s, _ := NewCompanyServiceImp(mockCompanyRepo, mockRedis)
 			got, err := s.GetAllCompanies()
 
 			if (err != nil) != tt.wantErr {
@@ -276,12 +280,13 @@ func TestService_GetJobs(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockCompanyRepo := repository.NewMockCompany(mc)
-			mockUserRepo := repository.NewMockUsers(mc)
+			//mockUserRepo := repository.NewMockUsers(mc)
+			mockRedis := redisconn.NewMockCaching(mc)
 
 			if tt.mockRepoResponse != nil {
 				mockCompanyRepo.EXPECT().GetJobs(tt.args.id).Return(tt.mockRepoResponse()).AnyTimes()
 			}
-			s, _ := NewService(mockUserRepo, mockCompanyRepo)
+			s, _ := NewCompanyServiceImp(mockCompanyRepo, mockRedis)
 			got, err := s.GetJobsByCompanyId(tt.args.id)
 
 			if (err != nil) != tt.wantErr {
@@ -324,12 +329,13 @@ func TestService_GetAllJobs(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockCompanyRepo := repository.NewMockCompany(mc)
-			mockUserRepo := repository.NewMockUsers(mc)
+			//mockUserRepo := repository.NewMockUsers(mc)
+			mockRedis := redisconn.NewMockCaching(mc)
 
 			if tt.mockRepoResponse != nil {
 				mockCompanyRepo.EXPECT().GetAllJobs().Return(tt.mockRepoResponse()).AnyTimes()
 			}
-			s, _ := NewService(mockUserRepo, mockCompanyRepo)
+			s, _ := NewCompanyServiceImp(mockCompanyRepo, mockRedis)
 			got, err := s.GetAllJobs()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Service.GetAllJobs() error = %v, wantErr %v", err, tt.wantErr)
@@ -383,7 +389,8 @@ func TestService_JobCreate(t *testing.T) {
 
 			mc := gomock.NewController(t)
 			mockCompanyRepo := repository.NewMockCompany(mc)
-			mockUserRepo := repository.NewMockUsers(mc)
+			//mockUserRepo := repository.NewMockUsers(mc)
+			mockRedis := redisconn.NewMockCaching(mc)
 
 			// job := model.Job{JobTitle: tt.args.nj.JobTitle, JobSalary: tt.args.nj.JobSalary, MinNoticePeriod: tt.args.nj.MinNoticePeriod,
 			// 	MaxNoticePeriod: tt.args.nj.MinNoticePeriod, Budget: tt.args.nj.Budget,
@@ -414,7 +421,7 @@ func TestService_JobCreate(t *testing.T) {
 				mockCompanyRepo.EXPECT().CreateJob(gomock.Any()).Return(tt.mockRepoResponse()).AnyTimes()
 			}
 
-			s, _ := NewService(mockUserRepo, mockCompanyRepo)
+			s, _ := NewCompanyServiceImp(mockCompanyRepo, mockRedis)
 			// gotL,err:=s.c.GetLocationById(tt.args.nj.JobLocations[0])
 			// gotQ,err:=s.c.GetQualificationById(tt.args.nj.Qualification[0])
 			// gotT,err:=s.c.GetTechnologyById(tt.args.nj.Technology[0])
@@ -483,12 +490,13 @@ func TestService_ProcessingJobDetails(t *testing.T) {
 
 			mc := gomock.NewController(t)
 			mockCompanyRepo := repository.NewMockCompany(mc)
-			mockUserRepo := repository.NewMockUsers(mc)
+			//mockUserRepo := repository.NewMockUsers(mc)
+			mockRedis := redisconn.NewMockCaching(mc)
 
 			if tt.mockRepoResponse != nil {
 				mockCompanyRepo.EXPECT().GetJobsByJobId(gomock.Any()).Return(tt.mockRepoResponse()).AnyTimes()
 			}
-			s, _ := NewService(mockUserRepo, mockCompanyRepo)
+			s, _ := NewCompanyServiceImp(mockCompanyRepo, mockRedis)
 			got, err := s.ProcessingJobDetails(tt.args.m)
 
 			if (err != nil) != tt.wantErr {

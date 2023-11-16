@@ -14,21 +14,41 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type handler struct {
+// type handler struct {
+// 	a  *auth.Auth
+// 	us services.UsersService
+// 	cs services.CompanyService
+// }
+
+// func NewHandler(a *auth.Auth, us services.UsersService, cs services.CompanyService) (*handler, error) {
+// 	if us == nil {
+// 		return nil, errors.New("service implementation not given")
+// 	}
+
+// 	return &handler{a: a, us: us, cs: cs}, nil
+
+// }
+
+type UserHandler struct {
 	a  *auth.Auth
 	us services.UsersService
-	cs services.CompanyService
 }
 
-func NewHandler(a *auth.Auth, us services.UsersService, cs services.CompanyService) (*handler, error) {
+func NewUserHandler(a *auth.Auth, us services.UsersService) (UserHandlerInt, error) {
 	if us == nil {
 		return nil, errors.New("service implementation not given")
 	}
 
-	return &handler{a: a, us: us, cs: cs}, nil
+	return &UserHandler{a: a, us: us}, nil
 
 }
-func (h *handler) userSignup(c *gin.Context) {
+
+type UserHandlerInt interface {
+	userSignup(c *gin.Context)
+	userLogin(c *gin.Context)
+}
+
+func (h *UserHandler) userSignup(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)
@@ -64,7 +84,7 @@ func (h *handler) userSignup(c *gin.Context) {
 
 }
 
-func (h *handler) userLogin(c *gin.Context) {
+func (h *UserHandler) userLogin(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)

@@ -7,12 +7,27 @@ import (
 	"fmt"
 	"project/internal/model"
 	redisconn "project/internal/redisConn"
+	"project/internal/repository"
 	"slices"
 	"strconv"
 	"sync"
 
 	"github.com/rs/zerolog/log"
 )
+
+type CompanyServiceImp struct {
+	c  repository.Company
+	re redisconn.Caching
+}
+
+func NewCompanyServiceImp(c repository.Company, re redisconn.Caching) (CompanyService, error) {
+	if c == nil {
+		return nil, errors.New("db connection not given")
+	}
+
+	return &CompanyServiceImp{c: c, re: re}, nil
+
+}
 
 //go:generate mockgen -source=companyService.go -destination=companyservice_mock.go -package=services
 type CompanyService interface {
@@ -26,7 +41,7 @@ type CompanyService interface {
 	ProcessingJobDetails([]model.JobRequest) ([]model.Job, error)
 }
 
-func (s *Service) CompanyCreate(nc model.CreateCompany) (model.Company, error) {
+func (s *CompanyServiceImp) CompanyCreate(nc model.CreateCompany) (model.Company, error) {
 	company := model.Company{CompanyName: nc.CompanyName, Adress: nc.Adress, Domain: nc.Domain}
 	cu, err := s.c.CreateCompany(company)
 	if err != nil {
@@ -37,7 +52,7 @@ func (s *Service) CompanyCreate(nc model.CreateCompany) (model.Company, error) {
 	return cu, nil
 }
 
-func (s *Service) GetAllCompanies() ([]model.Company, error) {
+func (s *CompanyServiceImp) GetAllCompanies() ([]model.Company, error) {
 
 	AllCompanies, err := s.c.GetAllCompany()
 	if err != nil {
@@ -48,7 +63,7 @@ func (s *Service) GetAllCompanies() ([]model.Company, error) {
 
 }
 
-func (s *Service) GetCompanyById(id int) (model.Company, error) {
+func (s *CompanyServiceImp) GetCompanyById(id int) (model.Company, error) {
 	if id > 10 {
 		return model.Company{}, errors.New("id cannnot be greater")
 	}
@@ -61,7 +76,7 @@ func (s *Service) GetCompanyById(id int) (model.Company, error) {
 
 }
 
-func (s *Service) JobCreate(nj model.CreateJob, id uint64) (model.JobResponse, error) {
+func (s *CompanyServiceImp) JobCreate(nj model.CreateJob, id uint64) (model.JobResponse, error) {
 	// var response model.JobResponse
 	var locations []model.Location
 	var qualifications []model.Qualification
@@ -104,7 +119,7 @@ func (s *Service) JobCreate(nj model.CreateJob, id uint64) (model.JobResponse, e
 	return res, nil
 }
 
-func (s *Service) GetJobsByCompanyId(id int) ([]model.Job, error) {
+func (s *CompanyServiceImp) GetJobsByCompanyId(id int) ([]model.Job, error) {
 	if id > 10 {
 		return nil, errors.New("id cannnot be greater")
 	}
@@ -115,7 +130,7 @@ func (s *Service) GetJobsByCompanyId(id int) ([]model.Job, error) {
 	return AllCompanies, nil
 }
 
-func (s *Service) GetAllJobs() ([]model.Job, error) {
+func (s *CompanyServiceImp) GetAllJobs() ([]model.Job, error) {
 
 	AllJobs, err := s.c.GetAllJobs()
 	if err != nil {
@@ -125,7 +140,7 @@ func (s *Service) GetAllJobs() ([]model.Job, error) {
 
 }
 
-func (s *Service) GetJobByJobId(id uint) (model.Job, error) {
+func (s *CompanyServiceImp) GetJobByJobId(id uint) (model.Job, error) {
 	if id > 10 {
 		return model.Job{}, errors.New("id cannnot be greater")
 	}
@@ -180,13 +195,13 @@ func (s *Service) GetJobByJobId(id uint) (model.Job, error) {
 // 	return job, nil
 // }
 
-func (s *Service) ProcessingJobDetails(m []model.JobRequest) ([]model.Job, error) {
+func (s *CompanyServiceImp) ProcessingJobDetails(m []model.JobRequest) ([]model.Job, error) {
 	wg := new(sync.WaitGroup)
 	// wg1 := new(sync.WaitGroup)
 	c1 := make(chan model.Job)
 	var JobsResult []model.Job
 	var Jobs model.Job
-	//var JobsMap map[uint]model.Job
+	//var JobsMap map[uint]model.Job                       Using maps as memory storage
 	//JobsMap := make(map[uint]model.Job)
 	// for _, v := range m {
 	// 	_, ok := JobsMap[v.JobId]
@@ -196,22 +211,25 @@ func (s *Service) ProcessingJobDetails(m []model.JobRequest) ([]model.Job, error
 	// 	}
 	// }
 	context := context.Background()
-	redis := redisconn.ReddisConc()
-	for _, v := range m {
 
+	for _, v := range m {
+		// using redis as In memory database.
 		//jobId := string(v.JobId)
-		jobId := strconv.FormatUint(uint64(v.JobId), 10)
-		_, err := redis.Get(context, jobId).Result()
+		//jobId := strconv.FormatUint(uint64(v.JobId), 10)
+		_, err := s.re.GetTheCacheData(context, v.JobId)
+		//_, err := redis.Get(context, jobId).Result()
 		if err != nil {
-			Jobs, _ := s.c.GetJobsByJobId(v.JobId)
-			JobsJson, err := json.Marshal(Jobs)
+			Jobs, err := s.c.GetJobsByJobId(v.JobId)
 			if err != nil {
-				fmt.Println("Error marshalling JSON:", err)
-				return nil, errors.New("error marshalling JSON")
+				fmt.Println("error getting data from databse", err)
+				return nil, errors.New("couldnot get data")
 			}
-			err = redis.Set(context, jobId, JobsJson, 0).Err()
+			//JobsJson, err := json.Marshal(Jobs)
+
+			err = s.re.AddToTheCache(context, v.JobId, Jobs)
+			//err = redis.Set(context, jobId, JobsJson, 0).Err()
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 		}
 	}
@@ -220,17 +238,20 @@ func (s *Service) ProcessingJobDetails(m []model.JobRequest) ([]model.Job, error
 		for _, v := range m {
 			wg.Add(1)
 			go func(v model.JobRequest) {
-				jobId := strconv.FormatUint(uint64(v.JobId), 10)
+				//jobId := strconv.FormatUint(uint64(v.JobId), 10)
 				defer wg.Done()
-				val, _ := redis.Get(context, jobId).Result()
-				// if err != nil {
-				// 	return nil, errors.New("couldnot retrieve 'all jobs' from db")
-				// }
+				//val, err := redis.Get(context, jobId).Result()
+				val, err := s.re.GetTheCacheData(context, v.JobId)
+				if err != nil {
+					log.Error().Msg("couldnot get from redis")
+					return
+				}
 				// wg1.Add(1)
 				//err := json.NewDecoder(val).Decode(&Jobs)
-				err := json.Unmarshal([]byte(val), &Jobs)
+				err = json.Unmarshal([]byte(val), &Jobs)
 				if err != nil {
 					fmt.Println("Error Unmarshalling JSON:", err)
+					return
 				}
 				result1 := Processing5Data(Jobs, v)
 				result2 := ProcessingOther5Data(Jobs, v)

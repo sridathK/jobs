@@ -51,13 +51,13 @@ func TestService_UserSignup(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockUserRepo := repository.NewMockUsers(mc)
-			mockCompanyRepo := repository.NewMockCompany(mc)
+			//mockCompanyRepo := repository.NewMockCompany(mc)
 
 			if tt.mockRepoResponse != nil {
 				mockUserRepo.EXPECT().CreateUser(gomock.Any()).Return(tt.mockRepoResponse()).AnyTimes()
 			}
 
-			s, _ := NewService(mockUserRepo, mockCompanyRepo)
+			s, _ := NewUserServiceImp(mockUserRepo)
 			got, err := s.UserSignup(tt.args.nu)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Service.UserSignup() error = %v, wantErr %v", err, tt.wantErr)
@@ -103,13 +103,13 @@ func TestService_Userlogin(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mc := gomock.NewController(t)
 			mockUserRepo := repository.NewMockUsers(mc)
-			mockCompanyRepo := repository.NewMockCompany(mc)
+			//mockCompanyRepo := repository.NewMockCompany(mc)
 
 			if tt.mockRepoResponse != nil {
 				mockUserRepo.EXPECT().FetchUserByEmail(gomock.Any()).Return(tt.mockRepoResponse()).AnyTimes()
 			}
 
-			s, _ := NewService(mockUserRepo, mockCompanyRepo)
+			s, _ := NewUserServiceImp(mockUserRepo)
 			got, err := s.Userlogin(tt.args.l)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Service.Userlogin() error = %v, wantErr %v", err, tt.wantErr)

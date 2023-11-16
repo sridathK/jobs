@@ -79,7 +79,7 @@ func Test_handler_companyCreation(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gin.SetMode(gin.TestMode)
 			c, rr, ms := tt.setup()
-			h := &handler{
+			h := &JobHandler{
 				cs: ms,
 			}
 			h.companyCreation(c)
@@ -134,7 +134,7 @@ func Test_handler_getAllCompany(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gin.SetMode(gin.TestMode)
 			c, rr, ms := tt.setup()
-			h := &handler{
+			h := &JobHandler{
 				cs: ms,
 			}
 			h.getAllCompany(c)
@@ -212,7 +212,7 @@ func Test_handler_getCompanyById(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gin.SetMode(gin.TestMode)
 			c, rr, ms := tt.setup()
-			h := &handler{
+			h := &JobHandler{
 				cs: ms,
 			}
 			h.getCompanyById(c)
@@ -301,7 +301,7 @@ func Test_handler_postJob(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gin.SetMode(gin.TestMode)
 			c, rr, ms := tt.setup()
-			h := &handler{
+			h := &JobHandler{
 				cs: ms,
 			}
 			h.postJobByCompany(c)
@@ -379,7 +379,7 @@ func Test_handler_getJobByCompany(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gin.SetMode(gin.TestMode)
 			c, rr, ms := tt.setup()
-			h := &handler{
+			h := &JobHandler{
 				cs: ms,
 			}
 			h.getJobByCompany(c)
@@ -434,7 +434,7 @@ func Test_handler_getAllJob(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gin.SetMode(gin.TestMode)
 			c, rr, ms := tt.setup()
-			h := &handler{
+			h := &JobHandler{
 				cs: ms,
 			}
 			h.getAllJob(c)
@@ -542,30 +542,12 @@ func Test_handler_processingJobInput(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gin.SetMode(gin.TestMode)
 			c, rr, ms := tt.setup()
-			h := &handler{
+			h := &JobHandler{
 				cs: ms,
 			}
 			h.processingJobInput(c)
 			assert.Equal(t, tt.expectedStatusCode, rr.Code)
 			assert.Equal(t, tt.expectedResponse, rr.Body.String())
-		})
-	}
-}
-
-func Test_handler_postJobByCompany(t *testing.T) {
-	type args struct {
-		c *gin.Context
-	}
-	tests := []struct {
-		name string
-		h    *handler
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.h.postJobByCompany(tt.args.c)
 		})
 	}
 }

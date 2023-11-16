@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"project/internal/model"
+	//redisconn "project/internal/redisConn"
 	"project/internal/repository"
 	"strconv"
 	"time"
@@ -14,19 +15,33 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Service struct {
-	r repository.Users
-	c repository.Company
-}
+// type Service struct {
+// 	r  repository.Users
+// 	c  repository.Company
+// 	re redisconn.Caching
+// }
 
 // GetCompanyById implements CompanyService.
 
-func NewService(r repository.Users, c repository.Company) (*Service, error) {
+// func NewService(r repository.Users, c repository.Company, re redisconn.Caching) (*Service, error) {
+// 	if r == nil {
+// 		return nil, errors.New("db connection not given")
+// 	}
+
+// 	return &Service{r: r, c: c, re: re}, nil
+
+// }
+
+type UserServiceImp struct {
+	r repository.Users
+}
+
+func NewUserServiceImp(r repository.Users) (UsersService, error) {
 	if r == nil {
 		return nil, errors.New("db connection not given")
 	}
 
-	return &Service{r: r, c: c}, nil
+	return &UserServiceImp{r: r}, nil
 
 }
 
@@ -36,7 +51,7 @@ type UsersService interface {
 	Userlogin(l model.UserLogin) (jwt.RegisteredClaims, error)
 }
 
-func (s *Service) UserSignup(nu model.UserSignup) (model.User, error) {
+func (s *UserServiceImp) UserSignup(nu model.UserSignup) (model.User, error) {
 
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(nu.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -55,7 +70,7 @@ func (s *Service) UserSignup(nu model.UserSignup) (model.User, error) {
 	return cu, nil
 
 }
-func (s *Service) Userlogin(l model.UserLogin) (jwt.RegisteredClaims, error) {
+func (s *UserServiceImp) Userlogin(l model.UserLogin) (jwt.RegisteredClaims, error) {
 	fu, err := s.r.FetchUserByEmail(l.Email)
 	if err != nil {
 		log.Error().Err(err).Msg("couldnot find user")
