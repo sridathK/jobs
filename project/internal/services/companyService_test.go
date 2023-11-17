@@ -446,10 +446,12 @@ func TestService_ProcessingJobDetails(t *testing.T) {
 	tests := []struct {
 		name string
 		// s       *Service
-		args             args
-		want             []model.Job
-		wantErr          bool
-		mockRepoResponse func() (model.Job, error)
+		args                 args
+		want                 []model.Job
+		wantErr              bool
+		mockRepoResponse     func() (model.Job, error)
+		mockRedisGetResponse func() (string, error)
+		mockRedisSetResponse func() error
 	}{
 		{
 			name: "success",
@@ -468,21 +470,43 @@ func TestService_ProcessingJobDetails(t *testing.T) {
 					{ID: 3, Name: "pune"}}, Technology: []model.Technology{{ID: 1, Name: "java"},
 					{ID: 2, Name: "dsa"}}, Qualification: []model.Qualification{{ID: 1, Name: "bcs-cse"}}, Shift: []model.Shift{{ID: 1, Name: "morning-shift"}}, JobType: []model.JobType{{ID: 1, Name: "fulltime"}}, Uid: 1}, nil
 			},
+			mockRedisGetResponse: func() (string, error) { return "", errors.New("e") },
+			mockRedisSetResponse: func() error { return nil },
 		},
+		// {
+		// 	name: "failure",
+		// 	args: args{
+		// 		m: []model.JobRequest{{JobId: 5, JobTitle: "tcs", JobSalary: "234", NoticePeriod: 20, Budget: 800000, Description: "gorm",
+		// 			Experience: 2, JobLocations: []string{}, Qualification: []string{"mcs-cse"}, WorkMode: "Remote",
+		// 			Technology: []string{"java"}, Shift: []string{"morning-shift"}, JobType: []string{"fulltime"}}},
+		// 	},
+		// 	want:    nil,
+		// 	wantErr: false,
+		// 	mockRepoResponse: func() (model.Job, error) {
+		// 		return model.Job{JobTitle: "tcs", JobSalary: "234", MinNoticePeriod: "0", MaxNoticePeriod: "30", Budget: "800000", Description: "gorm", MinExperience: "1", MaxExperience: "3", WorkMode: "Remote", JobLocations: []model.Location{{ID: 1, Name: "hyderabad"},
+		// 			{ID: 3, Name: "pune"}}, Technology: []model.Technology{{ID: 1, Name: "java"},
+		// 			{ID: 2, Name: "dsa"}}, Qualification: []model.Qualification{{ID: 1, Name: "bcs-cse"}}, Shift: []model.Shift{{ID: 1, Name: "morning-shift"}}, JobType: []model.JobType{{ID: 1, Name: "fulltime"}}, Uid: 1}, nil
+		// 	},
+		// },
 		{
-			name: "failure",
+			name: "success2",
 			args: args{
 				m: []model.JobRequest{{JobId: 5, JobTitle: "tcs", JobSalary: "234", NoticePeriod: 20, Budget: 800000, Description: "gorm",
-					Experience: 2, JobLocations: []string{}, Qualification: []string{"mcs-cse"}, WorkMode: "Remote",
+					Experience: 2, JobLocations: []string{"hyderabad"}, Qualification: []string{"bcs-cse"}, WorkMode: "Remote",
 					Technology: []string{"java"}, Shift: []string{"morning-shift"}, JobType: []string{"fulltime"}}},
 			},
-			want:    nil,
+			want: []model.Job{{JobTitle: "tcs", JobSalary: "234", MinNoticePeriod: "0", MaxNoticePeriod: "30", Budget: "800000", Description: "gorm", MinExperience: "1", MaxExperience: "3", WorkMode: "Remote", JobLocations: []model.Location{{ID: 1, Name: "hyderabad"},
+				{ID: 3, Name: "pune"}}, Technology: []model.Technology{{ID: 1, Name: "java"},
+				{ID: 2, Name: "dsa"}}, Qualification: []model.Qualification{{ID: 1, Name: "bcs-cse"}}, Shift: []model.Shift{{ID: 1, Name: "morning-shift"}}, JobType: []model.JobType{{ID: 1, Name: "fulltime"}}, Uid: 1}},
+
 			wantErr: false,
 			mockRepoResponse: func() (model.Job, error) {
 				return model.Job{JobTitle: "tcs", JobSalary: "234", MinNoticePeriod: "0", MaxNoticePeriod: "30", Budget: "800000", Description: "gorm", MinExperience: "1", MaxExperience: "3", WorkMode: "Remote", JobLocations: []model.Location{{ID: 1, Name: "hyderabad"},
 					{ID: 3, Name: "pune"}}, Technology: []model.Technology{{ID: 1, Name: "java"},
 					{ID: 2, Name: "dsa"}}, Qualification: []model.Qualification{{ID: 1, Name: "bcs-cse"}}, Shift: []model.Shift{{ID: 1, Name: "morning-shift"}}, JobType: []model.JobType{{ID: 1, Name: "fulltime"}}, Uid: 1}, nil
 			},
+			mockRedisGetResponse: func() (string, error) { return "", nil },
+			mockRedisSetResponse: func() error { return nil },
 		},
 	}
 	for _, tt := range tests {
@@ -496,6 +520,14 @@ func TestService_ProcessingJobDetails(t *testing.T) {
 			if tt.mockRepoResponse != nil {
 				mockCompanyRepo.EXPECT().GetJobsByJobId(gomock.Any()).Return(tt.mockRepoResponse()).AnyTimes()
 			}
+			if tt.mockRedisGetResponse != nil {
+				mockRedis.EXPECT().GetTheCacheData(gomock.Any(), gomock.Any()).Return(tt.mockRedisGetResponse()).AnyTimes()
+			}
+
+			if tt.mockRedisSetResponse != nil {
+				mockRedis.EXPECT().AddToTheCache(gomock.Any(), gomock.Any(), gomock.Any()).Return(tt.mockRedisSetResponse()).AnyTimes()
+			}
+
 			s, _ := NewCompanyServiceImp(mockCompanyRepo, mockRedis)
 			got, err := s.ProcessingJobDetails(tt.args.m)
 

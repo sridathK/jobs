@@ -10,6 +10,7 @@ import (
 	"project/internal/repository"
 	"slices"
 	"strconv"
+
 	"sync"
 
 	"github.com/rs/zerolog/log"
@@ -201,58 +202,40 @@ func (s *CompanyServiceImp) ProcessingJobDetails(m []model.JobRequest) ([]model.
 	c1 := make(chan model.Job)
 	var JobsResult []model.Job
 	var Jobs model.Job
-	//var JobsMap map[uint]model.Job                       Using maps as memory storage
-	//JobsMap := make(map[uint]model.Job)
-	// for _, v := range m {
-	// 	_, ok := JobsMap[v.JobId]
-	// 	if !ok {
-	// 		Jobs, _ := s.c.GetJobsByJobId(v.JobId)
-	// 		JobsMap[v.JobId] = Jobs
-	// 	}
-	// }
+
 	context := context.Background()
-
-	for _, v := range m {
-		// using redis as In memory database.
-		//jobId := string(v.JobId)
-		//jobId := strconv.FormatUint(uint64(v.JobId), 10)
-		_, err := s.re.GetTheCacheData(context, v.JobId)
-		//_, err := redis.Get(context, jobId).Result()
-		if err != nil {
-			Jobs, err := s.c.GetJobsByJobId(v.JobId)
-			if err != nil {
-				fmt.Println("error getting data from databse", err)
-				return nil, errors.New("couldnot get data")
-			}
-			//JobsJson, err := json.Marshal(Jobs)
-
-			err = s.re.AddToTheCache(context, v.JobId, Jobs)
-			//err = redis.Set(context, jobId, JobsJson, 0).Err()
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
 
 	go func() {
 		for _, v := range m {
 			wg.Add(1)
 			go func(v model.JobRequest) {
-				//jobId := strconv.FormatUint(uint64(v.JobId), 10)
+
 				defer wg.Done()
-				//val, err := redis.Get(context, jobId).Result()
+
 				val, err := s.re.GetTheCacheData(context, v.JobId)
 				if err != nil {
-					log.Error().Msg("couldnot get from redis")
-					return
+					Jobs, err = s.c.GetJobsByJobId(v.JobId)
+					if err != nil {
+						fmt.Println("error getting data from databse", err)
+						return
+					}
+
+					err = s.re.AddToTheCache(context, v.JobId, Jobs)
+
+					if err != nil {
+						log.Error().Msg("couldnot add to cache")
+						return
+					}
+				} else {
+					fmt.Println("Before ----", Jobs)
+					err = json.Unmarshal([]byte(val), &Jobs)
+					fmt.Println("After ----", Jobs)
+					if err != nil {
+						fmt.Println("Error Unmarshalling JSON:", err)
+
+					}
 				}
-				// wg1.Add(1)
-				//err := json.NewDecoder(val).Decode(&Jobs)
-				err = json.Unmarshal([]byte(val), &Jobs)
-				if err != nil {
-					fmt.Println("Error Unmarshalling JSON:", err)
-					return
-				}
+
 				result1 := Processing5Data(Jobs, v)
 				result2 := ProcessingOther5Data(Jobs, v)
 				//wg1.Wait()
@@ -275,25 +258,25 @@ func (s *CompanyServiceImp) ProcessingJobDetails(m []model.JobRequest) ([]model.
 	return JobsResult, nil
 }
 
-func Processing5Data(v model.Job, m model.JobRequest) bool {
-	minNP, err := strconv.Atoi(v.MinNoticePeriod)
+func Processing5Data(v1 model.Job, m model.JobRequest) bool {
+	minNP, err := strconv.Atoi(v1.MinNoticePeriod)
 	if err != nil {
 		panic("string to int error")
 	}
-	maxNP, err := strconv.Atoi(v.MaxNoticePeriod)
+	maxNP, err := strconv.Atoi(v1.MaxNoticePeriod)
 	if err != nil {
 		panic("string to int error")
 	}
-	Budget, err := strconv.Atoi(v.Budget)
+	Budget, err := strconv.Atoi(v1.Budget)
 	if err != nil {
 		panic("string to int error")
 	}
 
-	minEXP, err := strconv.Atoi(v.MinExperience)
+	minEXP, err := strconv.Atoi(v1.MinExperience)
 	if err != nil {
 		panic("string to int error")
 	}
-	maxEXP, err := strconv.Atoi(v.MaxExperience)
+	maxEXP, err := strconv.Atoi(v1.MaxExperience)
 	if err != nil {
 		panic("string to int error")
 	}
@@ -307,10 +290,10 @@ func Processing5Data(v model.Job, m model.JobRequest) bool {
 	if !(minEXP <= m.Experience && m.Experience <= maxEXP) {
 		return false
 	}
-	if !(containsLocation(v.JobLocations, m.JobLocations)) {
+	if !(containsLocation(v1.JobLocations, m.JobLocations)) {
 		return false
 	}
-	if !(containsQualification(v.Qualification, m.Qualification)) {
+	if !(containsQualification(v1.Qualification, m.Qualification)) {
 		return false
 	}
 
