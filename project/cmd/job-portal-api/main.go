@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"project/config"
 	"project/internal/auth"
 	"project/internal/database"
 	"project/internal/handlers"
@@ -24,8 +25,9 @@ func main() {
 
 }
 func startApp() error {
+	cfg := config.GetConfig()
 	log.Info().Msg("started main")
-	privatePEM, err := os.ReadFile(`C:\Users\ORR Training 1\Desktop\jobs\project\private.pem`)
+	privatePEM, err := os.ReadFile(`private.pem`)
 	if err != nil {
 		return fmt.Errorf("cannot find file private.pem %w", err)
 	}
@@ -34,7 +36,7 @@ func startApp() error {
 		return fmt.Errorf("cannot convert byte to key %w", err)
 	}
 
-	publicPEM, err := os.ReadFile(`C:\Users\ORR Training 1\Desktop\jobs\project\pubkey.pem`)
+	publicPEM, err := os.ReadFile(`pubkey.pem`)
 	if err != nil {
 		return fmt.Errorf("cannot find file pubkey.pem %w", err)
 	}
@@ -76,7 +78,7 @@ func startApp() error {
 	}
 
 	api := http.Server{ //server config and settimngs
-		Addr:    ":8090",
+		Addr:    fmt.Sprintf("%s:%s", cfg.AppConfig.Host, cfg.AppConfig.Port),
 		Handler: handlers.Api(a, seu, sec),
 	}
 	api.ListenAndServe()

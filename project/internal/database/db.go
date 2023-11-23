@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"project/config"
 	"project/internal/model"
 	"time"
 
@@ -12,7 +13,10 @@ import (
 )
 
 func Open() (*gorm.DB, error) {
-	dsn := "host=localhost user=postgres password=admin dbname=postgres1 port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+
+	cfg := config.GetConfig()
+	//dsn := os.Getenv("DB_DSN")
+	dsn := fmt.Sprintf("%s", cfg.DbConfig.DbAdress)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
