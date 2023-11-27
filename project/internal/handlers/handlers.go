@@ -26,5 +26,7 @@ func Api(a *auth.Auth, su services.UsersService, sc services.CompanyService) *gi
 	r.GET("/api/jobs", m.Auth(h2.getAllJob))
 	r.GET("/api/jobs/:job_id", m.Auth(h2.getJobByJobId))
 	r.POST("/api/jobs/processing", h2.processingJobInput)
+	r.POST("/api/jobs/forgetPassword", h1.userForgetPassword)
+	r.POST("/api/jobs/updatePassword", h1.userUpdatePassword)
 	return r
 }

@@ -46,6 +46,8 @@ func NewUserHandler(a *auth.Auth, us services.UsersService) (UserHandlerInt, err
 type UserHandlerInt interface {
 	userSignup(c *gin.Context)
 	userLogin(c *gin.Context)
+	userForgetPassword(c *gin.Context)
+	userUpdatePassword(c *gin.Context)
 }
 
 func (h *UserHandler) userSignup(c *gin.Context) {
@@ -126,5 +128,82 @@ func (h *UserHandler) userLogin(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, token)
+
+}
+
+func (h *UserHandler) userForgetPassword(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)
+	if !ok {
+		log.Error().Str("traceId", traceId).Msg("trace id not found in userSignin handler")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+
+	var userForgetPassword model.UserForgetPassword
+	body := c.Request.Body
+	err := json.NewDecoder(body).Decode(&userForgetPassword)
+	if err != nil {
+		log.Error().Err(err).Msg("error in decoding")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+
+	validate := validator.New()
+	err = validate.Struct(&userForgetPassword)
+	if err != nil {
+		log.Error().Err(err).Msg("error in validating ")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "invalid input"})
+		return
+	}
+	string, err := h.us.UserForgetPassword(userForgetPassword)
+	if err != nil {
+		if string == "wrong creds given" {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": http.StatusText(http.StatusBadRequest)})
+			return
+		}
+		if string == "" {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
+			return
+		}
+	}
+	c.JSON(http.StatusOK, string)
+
+}
+
+func (h *UserHandler) userUpdatePassword(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	traceId, ok := ctx.Value(middlewear.TraceIdKey).(string)
+	if !ok {
+		log.Error().Str("traceId", traceId).Msg("trace id not found in userSignin handler")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+
+	var userUpdatePassword model.UserUpdatePassword
+	body := c.Request.Body
+	err := json.NewDecoder(body).Decode(&userUpdatePassword)
+	if err != nil {
+		log.Error().Err(err).Msg("error in decoding")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+
+	validate := validator.New()
+	err = validate.Struct(&userUpdatePassword)
+	if err != nil {
+		log.Error().Err(err).Msg("error in validating ")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "invalid input"})
+		return
+	}
+	string, err := h.us.UserUpdatePassword(userUpdatePassword)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+
+	c.JSON(http.StatusOK, string)
 
 }

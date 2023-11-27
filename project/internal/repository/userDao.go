@@ -39,6 +39,8 @@ func NewUserRepo(db *gorm.DB) (Users, error) {
 type Users interface {
 	CreateUser(model.User) (model.User, error)
 	FetchUserByEmail(string) (model.User, error)
+	FetchUserByEmailAndDob(email string, dob string) (model.User, error)
+	FetchUserByEmailAndUpdate(email string, password string) (model.User, error)
 }
 
 func (r *UserRepo) CreateUser(u model.User) (model.User, error) {
@@ -57,4 +59,24 @@ func (r *UserRepo) FetchUserByEmail(s string) (model.User, error) {
 	}
 	return u, nil
 
+}
+func (r *UserRepo) FetchUserByEmailAndDob(email string, dob string) (model.User, error) {
+	var u model.User
+	tx := r.db.Where("email= ? AND dob= ?", email, dob).First(&u)
+	if tx.Error != nil {
+		return model.User{}, tx.Error
+	}
+	return u, nil
+}
+
+func (r *UserRepo) FetchUserByEmailAndUpdate(email string, password string) (model.User, error) {
+	var u model.User
+	tx := r.db.Where("email=?", email).First(&u)
+	if tx.Error != nil {
+		return model.User{}, nil
+	}
+
+	u.PasswordHash = password
+	r.db.Save(&u)
+	return u, nil
 }

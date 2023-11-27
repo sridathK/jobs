@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"project/config"
 	"project/internal/auth"
 	"project/internal/database"
@@ -27,20 +26,21 @@ func main() {
 func startApp() error {
 	cfg := config.GetConfig()
 	log.Info().Msg("started main")
-	privatePEM, err := os.ReadFile(`private.pem`)
-	if err != nil {
-		return fmt.Errorf("cannot find file private.pem %w", err)
-	}
-	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privatePEM)
+	privatePEM := cfg.Keys.PrivateKey
+	// if err != nil {
+	// 	return fmt.Errorf("cannot find file private.pem %w", err)
+	// }
+
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(privatePEM))
 	if err != nil {
 		return fmt.Errorf("cannot convert byte to key %w", err)
 	}
 
-	publicPEM, err := os.ReadFile(`pubkey.pem`)
-	if err != nil {
-		return fmt.Errorf("cannot find file pubkey.pem %w", err)
-	}
-	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicPEM)
+	publicPEM := cfg.Keys.PublicKey
+	// if err != nil {
+	// 	return fmt.Errorf("cannot find file pubkey.pem %w", err)
+	// }
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(publicPEM))
 	if err != nil {
 		return fmt.Errorf("cannot convert byte to key %w", err)
 	}
@@ -72,7 +72,7 @@ func startApp() error {
 		return err
 	}
 
-	seu, err := services.NewUserServiceImp(repou)
+	seu, err := services.NewUserServiceImp(repou, re)
 	if err != nil {
 		return err
 	}

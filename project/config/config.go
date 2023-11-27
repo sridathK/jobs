@@ -12,6 +12,7 @@ type Config struct {
 	AppConfig   AppConfig
 	DbConfig    DbConfig
 	RedisConfig RedisConfig
+	Keys        Keys
 }
 
 type AppConfig struct {
@@ -23,6 +24,14 @@ type DbConfig struct {
 	DbAdress string `env:"DB_DSN,required=true"`
 }
 type RedisConfig struct {
+	Adress   string `env:"Redis_Adress,required=true"`
+	Password string `env:"Redis_Password,required=true"`
+	DB       string `env:"Redis_DB,required=true"`
+}
+
+type Keys struct {
+	PrivateKey string `env:"PrivateKey,required=true"`
+	PublicKey  string `env:"PublicKey,required=true"`
 }
 
 func init() {

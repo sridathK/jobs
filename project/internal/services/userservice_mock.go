@@ -39,6 +39,21 @@ func (m *MockUsersService) EXPECT() *MockUsersServiceMockRecorder {
 	return m.recorder
 }
 
+// UserForgetPassword mocks base method.
+func (m *MockUsersService) UserForgetPassword(uf model.UserForgetPassword) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UserForgetPassword", uf)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UserForgetPassword indicates an expected call of UserForgetPassword.
+func (mr *MockUsersServiceMockRecorder) UserForgetPassword(uf any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserForgetPassword", reflect.TypeOf((*MockUsersService)(nil).UserForgetPassword), uf)
+}
+
 // UserSignup mocks base method.
 func (m *MockUsersService) UserSignup(nu model.UserSignup) (model.User, error) {
 	m.ctrl.T.Helper()
@@ -52,6 +67,21 @@ func (m *MockUsersService) UserSignup(nu model.UserSignup) (model.User, error) {
 func (mr *MockUsersServiceMockRecorder) UserSignup(nu any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserSignup", reflect.TypeOf((*MockUsersService)(nil).UserSignup), nu)
+}
+
+// UserUpdatePassword mocks base method.
+func (m *MockUsersService) UserUpdatePassword(up model.UserUpdatePassword) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UserUpdatePassword", up)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UserUpdatePassword indicates an expected call of UserUpdatePassword.
+func (mr *MockUsersServiceMockRecorder) UserUpdatePassword(up any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserUpdatePassword", reflect.TypeOf((*MockUsersService)(nil).UserUpdatePassword), up)
 }
 
 // Userlogin mocks base method.

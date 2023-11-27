@@ -67,3 +67,33 @@ func (mr *MockUsersMockRecorder) FetchUserByEmail(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchUserByEmail", reflect.TypeOf((*MockUsers)(nil).FetchUserByEmail), arg0)
 }
+
+// FetchUserByEmailAndDob mocks base method.
+func (m *MockUsers) FetchUserByEmailAndDob(email, dob string) (model.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FetchUserByEmailAndDob", email, dob)
+	ret0, _ := ret[0].(model.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FetchUserByEmailAndDob indicates an expected call of FetchUserByEmailAndDob.
+func (mr *MockUsersMockRecorder) FetchUserByEmailAndDob(email, dob any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchUserByEmailAndDob", reflect.TypeOf((*MockUsers)(nil).FetchUserByEmailAndDob), email, dob)
+}
+
+// FetchUserByEmailAndUpdate mocks base method.
+func (m *MockUsers) FetchUserByEmailAndUpdate(email, password string) (model.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FetchUserByEmailAndUpdate", email, password)
+	ret0, _ := ret[0].(model.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FetchUserByEmailAndUpdate indicates an expected call of FetchUserByEmailAndUpdate.
+func (mr *MockUsersMockRecorder) FetchUserByEmailAndUpdate(email, password any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchUserByEmailAndUpdate", reflect.TypeOf((*MockUsers)(nil).FetchUserByEmailAndUpdate), email, password)
+}
